@@ -9,7 +9,7 @@ import java.util.UUID;
 import com.hotelmgmt.models.user.Guest;
 import com.hotelmgmt.models.room.Room;
 
-public class RoomService implements Serializable {
+public class RoomServiceOrder implements Serializable {
     private String id;
     private Guest guest;
     private Room room;
@@ -20,7 +20,7 @@ public class RoomService implements Serializable {
     private LocalDateTime deliveryTime;
     private BigDecimal totalAmount;
 
-    public RoomService(Guest guest, Room room, List<MenuItem> items, String specialInstructions) {
+    public RoomServiceOrder(Guest guest, Room room, List<MenuItem> items, String specialInstructions) {
         this.id = UUID.randomUUID().toString();
         this.guest = guest;
         this.room = room;
@@ -67,7 +67,7 @@ public class RoomService implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("RoomService{id='%s', guest='%s', room='%s', items=%d, status=%s, amount=%s}",
+        return String.format("RoomServiceOrder{id='%s', guest='%s', room='%s', items=%d, status=%s, amount=%s}",
                 id, guest.getUsername(), room.getRoomNumber(), items.size(), status, totalAmount);
     }
 } 

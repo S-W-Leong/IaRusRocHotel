@@ -13,7 +13,7 @@ import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
-import com.hotelmgmt.models.roomService.RoomService;
+import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import com.hotelmgmt.models.roomService.RoomServiceStatus;
 import com.hotelmgmt.models.room.RoomStatus;
 import com.hotelmgmt.models.reservation.Reservation;
@@ -21,22 +21,36 @@ import com.hotelmgmt.models.reservation.ReservationStatus;
 import com.hotelmgmt.models.billing.Invoice;
 import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.services.AuthenticationService;
-
+import com.hotelmgmt.services.BookingManager;
+import com.hotelmgmt.services.RoomServiceManager;
+import com.hotelmgmt.services.PaymentService;
+import com.hotelmgmt.services.ReservationService;
+import com.hotelmgmt.services.RoomService;
 public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
     private User currentUser;
     private final List<Room> rooms = new ArrayList<>();
     private final List<Reservation> reservations = new ArrayList<>();
-    private final List<RoomService> roomServices = new ArrayList<>();
+    private final List<RoomServiceOrder> roomServices = new ArrayList<>();
     private final List<MenuItem> menuItems = new ArrayList<>();
     private final List<Invoice> invoices = new ArrayList<>();
+    private final RoomService roomService;
+    private final ReservationService reservationService;
+    private final RoomServiceManager roomServiceManager;
+    private final PaymentService paymentService;
+    private final BookingManager bookingManager;
 
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
         this.authService = new AuthenticationService();
         seedRooms();
         seedMenuItems();
+        this.roomService = new RoomService(rooms);
+        this.reservationService = new ReservationService();
+        this.roomServiceManager = new RoomServiceManager();
+        this.paymentService = new PaymentService();
+        this.bookingManager = new BookingManager(roomService, reservationService, paymentService, roomServiceManager);
     }
 
     public void start() {
@@ -207,45 +221,25 @@ public class MainMenu {
     }
 
     private void bookRoom() {
-        System.out.println("\n--- Available Rooms ---");
-        List<Room> availableRooms = new ArrayList<>();
-        for (Room room : rooms) {
-            if (room.getStatus() == RoomStatus.AVAILABLE) {
-                availableRooms.add(room);
-            }
+        System.out.println("\n--- Available Room Types ---");
+        for (RoomType type : RoomType.values()) {
+            System.out.println("- " + type);
         }
-        if (availableRooms.isEmpty()) {
-            System.out.println("No rooms available.");
-            ConsoleUtils.waitForEnter(scanner);
-            return;
-        }
-        for (int i = 0; i < availableRooms.size(); i++) {
-            System.out.println((i+1) + ". " + availableRooms.get(i));
-        }
-        System.out.print("Select a room to book (number): ");
-        String input = scanner.nextLine();
-        int idx;
-        try {
-            idx = Integer.parseInt(input) - 1;
-            if (idx < 0 || idx >= availableRooms.size()) throw new Exception();
-        } catch (Exception e) {
-            System.out.println("Invalid selection.");
-            ConsoleUtils.waitForEnter(scanner);
-            return;
-        }
-        Room selectedRoom = availableRooms.get(idx);
+        System.out.print("Enter room type: ");
+        String roomType = scanner.nextLine();
         System.out.print("Enter check-in date (YYYY-MM-DD): ");
         String checkInStr = scanner.nextLine();
         System.out.print("Enter check-out date (YYYY-MM-DD): ");
         String checkOutStr = scanner.nextLine();
         try {
-            LocalDateTime checkIn = LocalDateTime.parse(checkInStr + "T12:00:00");
-            LocalDateTime checkOut = LocalDateTime.parse(checkOutStr + "T12:00:00");
-            if (checkOut.isBefore(checkIn)) throw new Exception();
-            Reservation reservation = new Reservation((Guest)currentUser, selectedRoom, checkIn, checkOut, "");
-            reservations.add(reservation);
-            selectedRoom.setStatus(RoomStatus.RESERVED);
-            System.out.println("Room booked successfully! Reservation ID: " + reservation.getId());
+            java.time.LocalDate checkIn = java.time.LocalDate.parse(checkInStr);
+            java.time.LocalDate checkOut = java.time.LocalDate.parse(checkOutStr);
+            Reservation reservation = bookingManager.bookRoom((Guest) currentUser, roomType, checkIn, checkOut);
+            if (reservation != null) {
+                System.out.println("Room booked! Reservation ID: " + reservation.getId());
+            } else {
+                System.out.println("No available room for the selected type and dates.");
+            }
         } catch (Exception e) {
             System.out.println("Invalid dates or error booking room.");
         }
@@ -284,7 +278,7 @@ public class MainMenu {
         MenuItem selectedItem = menuItems.get(idx);
         // Find guest's latest reservation
         Reservation latest = null;
-        for (Reservation r : reservations) {
+        for (Reservation r : reservationService.getAllReservations()) {
             if (r.getGuest().getUsername().equals(currentUser.getUsername())) {
                 latest = r;
             }
@@ -296,8 +290,7 @@ public class MainMenu {
         }
         List<MenuItem> orderItems = new ArrayList<>();
         orderItems.add(selectedItem);
-        RoomService order = new RoomService((Guest)currentUser, latest.getRoom(), orderItems, "");
-        roomServices.add(order);
+        RoomServiceOrder order = roomServiceManager.placeOrder((Guest)currentUser, latest.getRoom(), orderItems, "");
         System.out.println("Room service order placed! Order ID: " + order.getId());
         ConsoleUtils.waitForEnter(scanner);
     }
@@ -305,7 +298,7 @@ public class MainMenu {
     private void viewBills() {
         System.out.println("\n--- My Bills ---");
         boolean found = false;
-        for (Invoice inv : invoices) {
+        for (Invoice inv : paymentService.getAllInvoices()) {
             if (inv.getReservation().getGuest().getUsername().equals(currentUser.getUsername())) {
                 System.out.println(inv);
                 found = true;

@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import com.hotelmgmt.models.reservation.Reservation;
-import com.hotelmgmt.models.roomService.RoomService;
+import com.hotelmgmt.models.roomService.RoomServiceOrder;
 
 public class Invoice implements Serializable {
     private String id;
     private Reservation reservation;
-    private List<RoomService> roomServices;
+    private List<RoomServiceOrder> roomServices;
     private List<AdditionalCharge> additionalCharges;
     private BigDecimal roomCharges;
     private BigDecimal serviceCharges;
@@ -38,7 +38,7 @@ public class Invoice implements Serializable {
         calculateTotalAmount();
     }
 
-    public void addRoomService(RoomService roomService) {
+    public void addRoomService(RoomServiceOrder roomService) {
         roomServices.add(roomService);
         serviceCharges = serviceCharges.add(roomService.getTotalAmount());
         calculateTotalAmount();
@@ -82,7 +82,7 @@ public class Invoice implements Serializable {
     // Getters
     public String getId() { return id; }
     public Reservation getReservation() { return reservation; }
-    public List<RoomService> getRoomServices() { return new ArrayList<>(roomServices); }
+    public List<RoomServiceOrder> getRoomServices() { return new ArrayList<>(roomServices); }
     public List<AdditionalCharge> getAdditionalCharges() { return new ArrayList<>(additionalCharges); }
     public List<Payment> getPayments() { return new ArrayList<>(payments); }
     public BigDecimal getRoomCharges() { return roomCharges; }
