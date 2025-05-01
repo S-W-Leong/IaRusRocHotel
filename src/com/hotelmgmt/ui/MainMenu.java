@@ -50,7 +50,7 @@ public class MainMenu {
         seedMenuItems();
         this.roomService = new RoomService(rooms);
         this.reservationService = new ReservationService();
-        this.roomServiceManager = new RoomServiceManager();
+        this.roomServiceManager = new RoomServiceManager(rooms);
         this.paymentService = new PaymentService();
         this.bookingManager = new BookingManager(roomService, reservationService, paymentService, roomServiceManager);
         this.housekeepingService = new HousekeepingService();
