@@ -52,7 +52,7 @@ public class MainMenu {
         seedMenuItems();
         this.roomService = new RoomService(rooms);
         this.reservationService = new ReservationService();
-        this.roomServiceManager = new RoomServiceManager();
+        this.roomServiceManager = new RoomServiceManager(rooms);
         this.paymentService = new PaymentService();
         this.bookingManager = new BookingManager(roomService, reservationService, paymentService, roomServiceManager);
         this.housekeepingService = new HousekeepingService();
@@ -109,7 +109,6 @@ public class MainMenu {
                 System.out.println("2. Room Booking");
                 System.out.println("3. My Reservations");
                 System.out.println("4. Room Service");
-                System.out.println("5. View Bills");
             } else if (currentUser.getRole() == UserRole.MANAGER) {
                 System.out.println("2. Room Management");
                 System.out.println("3. Housekeeping Management");
@@ -220,9 +219,6 @@ public class MainMenu {
                     break;
                 case "4":
                     orderRoomService();
-                    break;
-                case "5":
-                    viewBills();
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
@@ -495,9 +491,25 @@ public class MainMenu {
             // Show invoice payment status
             Invoice invoice = paymentService.getInvoiceById(reservation.getId());
             if (invoice != null) {
+                System.out.println("\n--- Invoice ---");
                 System.out.println("Invoice Payment Status: " + invoice.getPaymentStatus());
                 System.out.println("Amount Paid: RM" + String.format("%.2f", invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)));
                 System.out.println("Outstanding: RM" + String.format("%.2f", invoice.getTotalAmount().subtract(invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add))));
+                // Display room service orders
+                List<RoomServiceOrder> orders = roomServiceManager.getOrdersForRoom(reservation.getRoom());
+                boolean hasRoomService = false;
+                for (RoomServiceOrder order : orders) {
+                    if (order.getGuest().equals(reservation.getGuest())) {
+                        if (!hasRoomService) {
+                            System.out.println("Room Service Orders:");
+                            hasRoomService = true;
+                        }
+                        System.out.println("- Order ID: " + order.getId() + ", Items: " + order.getItems());
+                    }
+                }
+                if (!hasRoomService) {
+                    System.out.println("No room service orders for this stay.");
+                }
             }
             System.out.println("\nOptions:");
             System.out.println("1. Check-in");
@@ -528,11 +540,31 @@ public class MainMenu {
                     break;
                 case "2":
                     if (invoice != null) {
-                        BigDecimal outstanding = invoice.getTotalAmount().subtract(invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                        if (outstanding.compareTo(BigDecimal.ZERO) > 0) {
-                            System.out.println("Outstanding balance detected. Please pay the remaining amount to check out.");
-                            boolean paidNow = false;
-                            do {
+                        // Always display invoice and room service orders
+                        while (true) {
+                            ConsoleUtils.clearScreen();
+                            System.out.println("\n--- Invoice ---");
+                            System.out.println("Invoice Payment Status: " + invoice.getPaymentStatus());
+                            System.out.println("Amount Paid: RM" + String.format("%.2f", invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add)));
+                            System.out.println("Outstanding: RM" + String.format("%.2f", invoice.getTotalAmount().subtract(invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add))));
+                            // Display room service orders
+                            List<RoomServiceOrder> orders = roomServiceManager.getOrdersForRoom(reservation.getRoom());
+                            boolean hasRoomService = false;
+                            for (RoomServiceOrder order : orders) {
+                                if (order.getGuest().equals(reservation.getGuest())) {
+                                    if (!hasRoomService) {
+                                        System.out.println("Room Service Orders:");
+                                        hasRoomService = true;
+                                    }
+                                    System.out.println("- Order ID: " + order.getId() + ", Items: " + order.getItems());
+                                }
+                            }
+                            if (!hasRoomService) {
+                                System.out.println("No room service orders for this stay.");
+                            }
+                            BigDecimal outstanding = invoice.getTotalAmount().subtract(invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add));
+                            if (outstanding.compareTo(BigDecimal.ZERO) > 0) {
+                                System.out.println("\nOutstanding balance detected. Please pay the remaining amount to check out.");
                                 System.out.print("Enter payment amount (RM): ");
                                 String payAmountStr = scanner.nextLine();
                                 BigDecimal payAmount = new BigDecimal(payAmountStr);
@@ -558,25 +590,33 @@ public class MainMenu {
                                 String payTransRef = scanner.nextLine();
                                 System.out.print("Enter notes (optional): ");
                                 String payNotes = scanner.nextLine();
-                                paidNow = paymentService.processPayment(invoice, payAmount, payMethod, payTransRef, payNotes);
+                                boolean paidNow = paymentService.processPayment(invoice, payAmount, payMethod, payTransRef, payNotes);
                                 if (paidNow) {
                                     System.out.println("Payment successful! Outstanding balance cleared.");
                                 } else {
                                     System.out.println("Partial payment received. Please pay the full outstanding amount to check out.");
                                 }
                                 System.out.println("Invoice Payment Status: " + invoice.getPaymentStatus());
-                                outstanding = invoice.getTotalAmount().subtract(invoice.getPayments().stream().map(p -> p.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add));
-                            } while (outstanding.compareTo(BigDecimal.ZERO) > 0);
+                                ConsoleUtils.waitForEnter(scanner);
+                                // Loop again if still not paid
+                                continue;
+                            }
+                            // If fully paid, break loop to proceed with check-out
+                            break;
                         }
+                        // After payment loop, check invoice status again
+                        if ("PAID".equals(invoice.getPaymentStatus().toString())) {
+                            System.out.println("Proceeding with check-out...");
+                            if (bookingManager.checkOut(reservation, PaymentMethod.CASH, "", "")) {
+                                System.out.println("Successfully checked out!");
+                            } else {
+                                System.out.println("Check-out failed. Reservation must be in CHECKED_IN status.");
+                            }
+                        } else {
+                            System.out.println("Cannot check out. Invoice is not fully paid.");
+                        }
+                        ConsoleUtils.waitForEnter(scanner);
                     }
-                    // Now proceed with check-out
-                    System.out.println("Proceeding with check-out...");
-                    if (bookingManager.checkOut(reservation, PaymentMethod.CASH, "", "")) {
-                        System.out.println("Successfully checked out!");
-                    } else {
-                        System.out.println("Check-out failed. Reservation must be in CHECKED_IN status.");
-                    }
-                    ConsoleUtils.waitForEnter(scanner);
                     break;
                 case "3":
                     if (bookingManager.cancelReservation(reservation)) {
@@ -612,35 +652,24 @@ public class MainMenu {
             return;
         }
         MenuItem selectedItem = menuItems.get(idx);
-        // Find guest's latest reservation
-        Reservation latest = null;
+        // Find guest's checked-in reservation
+        Reservation checkedIn = null;
         for (Reservation r : reservationService.getAllReservations()) {
-            if (r.getGuest().getUsername().equals(currentUser.getUsername())) {
-                latest = r;
+            if (r.getGuest().getUsername().equals(currentUser.getUsername()) && r.getStatus() == ReservationStatus.CHECKED_IN) {
+                checkedIn = r;
+                break;
             }
         }
-        if (latest == null) {
-            System.out.println("You must have a reservation to order room service.");
+        if (checkedIn == null) {
+            System.out.println("You must be checked in to order room service.");
             ConsoleUtils.waitForEnter(scanner);
             return;
         }
         List<MenuItem> orderItems = new ArrayList<>();
         orderItems.add(selectedItem);
-        RoomServiceOrder order = roomServiceManager.placeOrder((Guest)currentUser, latest.getRoom(), orderItems, "");
+        RoomServiceOrder order = roomServiceManager.placeOrder((Guest)currentUser, checkedIn.getRoom(), orderItems, "");
         System.out.println("Room service order placed! Order ID: " + order.getId());
-        ConsoleUtils.waitForEnter(scanner);
-    }
-
-    private void viewBills() {
-        System.out.println("\n--- My Bills ---");
-        boolean found = false;
-        for (Invoice inv : paymentService.getAllInvoices()) {
-            if (inv.getReservation().getGuest().getUsername().equals(currentUser.getUsername())) {
-                System.out.println(inv);
-                found = true;
-            }
-        }
-        if (!found) System.out.println("No bills found.");
+        System.out.println("Charges will be added to your bill and payable at check-out.");
         ConsoleUtils.waitForEnter(scanner);
     }
 }
