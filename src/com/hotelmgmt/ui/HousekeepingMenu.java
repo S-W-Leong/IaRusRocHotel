@@ -109,26 +109,31 @@ public class HousekeepingMenu {
         // Get valid task status
         TaskStatus status;
         while (true) {
-            System.out.print("Enter new status (PENDING, IN_PROGRESS, COMPLETED, CANCELLED): ");
-            String statusInput = scanner.nextLine();
+            System.out.println("\nAvailable Task Status:");
+            System.out.println("1. PENDING      - Task is waiting to be started");
+            System.out.println("2. IN_PROGRESS  - Task is currently being worked on");
+            System.out.println("3. COMPLETED    - Task has been finished");
+            System.out.println("4. CANCELLED    - Task has been cancelled");
+            System.out.print("\nEnter status number (1-4): ");
+            
+            String input = scanner.nextLine();
             try {
-                status = TaskStatus.valueOf(statusInput.toUpperCase());
+                switch (input) {
+                    case "1": status = TaskStatus.PENDING; break;
+                    case "2": status = TaskStatus.IN_PROGRESS; break; 
+                    case "3": status = TaskStatus.COMPLETED; break;
+                    case "4": status = TaskStatus.CANCELLED; break;
+                    default: throw new IllegalArgumentException();
+                }
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid status. Please enter one of: PENDING, IN_PROGRESS, COMPLETED, CANCELLED");
+                System.out.println("\nInvalid selection. Please enter a number between 1-4.");
             }
         }
 
-        // Get valid notes
-        String notes;
-        while (true) {
-            System.out.print("Enter progress notes: ");
-            notes = scanner.nextLine();
-            if (notes != null && !notes.trim().isEmpty()) {
-                break;
-            }
-            System.out.println("Progress notes cannot be empty. Please try again.");
-        }
+        // Get notes
+        System.out.print("Enter progress notes (optional): ");
+        String notes = scanner.nextLine();
 
         housekeepingService.updateTaskStatus(taskId, status, notes);
         System.out.println("Task status updated.");
