@@ -26,7 +26,7 @@ public class RegisterRequirement {
         System.out.println("║ • Must be in valid phone number format                                       ║");
         System.out.println("║ • Can include +, -, (), and spaces                                           ║");
         System.out.println("║ • Minimum 8 digits                                                           ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝\n\n\n\n\n\n\n\n");
     }
 
     public static boolean isValidUsername(String username) {
