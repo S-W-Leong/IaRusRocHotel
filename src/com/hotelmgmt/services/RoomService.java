@@ -6,6 +6,7 @@ import java.util.List;
 import com.hotelmgmt.models.reservation.Reservation;
 import java.time.LocalDateTime;
 
+// RoomService serves to find available rooms for a guest during the reservation process
 public class RoomService {
     private List<Room> rooms;
 
