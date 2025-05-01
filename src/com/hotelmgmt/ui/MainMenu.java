@@ -67,6 +67,7 @@ public class MainMenu {
     private void showLoginMenu() {
         while (currentUser == null) {
             ConsoleUtils.clearScreen();
+            Logo.display();
             System.out.println("\nLogin Menu");
             System.out.println("1. Login");
             System.out.println("2. Register as Guest");
@@ -95,6 +96,7 @@ public class MainMenu {
     private void showMainMenu() {
         while (currentUser != null) {
             ConsoleUtils.clearScreen();
+            Logo.display();
             System.out.println("\nMain Menu - Welcome " + currentUser.getFullName());
             System.out.println("1. View Profile");
             

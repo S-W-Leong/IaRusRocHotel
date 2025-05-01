@@ -64,4 +64,4 @@ public class RegisterRequirement {
         String phoneRegex = "^[+]?[0-9\\s-()]{8,}$";
         return phone.matches(phoneRegex);
     }
-} 
+}
