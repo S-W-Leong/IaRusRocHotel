@@ -19,7 +19,7 @@ public class Room implements Serializable {
         this.basePrice = basePrice;
         this.floor = floor;
         this.needsCleaning = false;
-        this.description = type.getDescription();
+        this.description = type != null ? type.getDescription() : ""; // Add null check
     }
 
     // Getters and Setters
@@ -44,4 +44,4 @@ public class Room implements Serializable {
         return String.format("Room{number='%s', type=%s, status=%s, price=%s, floor=%d, needsCleaning=%b}",
                 roomNumber, type, status, basePrice, floor, needsCleaning);
     }
-} 
+}
