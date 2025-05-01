@@ -229,11 +229,10 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                //zihao
+                    //zihao
                     break;
-                    
                 case "3":
-                new HousekeepingMenu(housekeepingService).showMenu();
+                    new HousekeepingMenu(housekeepingService).showMenu();
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
@@ -248,20 +247,18 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                //room status
+                    //room status
                     break;
-                    
                 case "3":
-                //tasks
+                    //tasks
                     break;
-
                 case "4":
-                //reports
+                    //reports
                     break;
-                    
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
+            }
         }
     }
 
