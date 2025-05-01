@@ -26,6 +26,8 @@ import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.PaymentService;
 import com.hotelmgmt.services.ReservationService;
 import com.hotelmgmt.services.RoomService;
+import com.hotelmgmt.services.HousekeepingService;
+
 public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
@@ -40,6 +42,7 @@ public class MainMenu {
     private final RoomServiceManager roomServiceManager;
     private final PaymentService paymentService;
     private final BookingManager bookingManager;
+    private final HousekeepingService housekeepingService;
 
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
@@ -51,6 +54,7 @@ public class MainMenu {
         this.roomServiceManager = new RoomServiceManager();
         this.paymentService = new PaymentService();
         this.bookingManager = new BookingManager(roomService, reservationService, paymentService, roomServiceManager);
+        this.housekeepingService = new HousekeepingService();
     }
 
     public void start() {
@@ -104,7 +108,7 @@ public class MainMenu {
                 System.out.println("5. View Bills");
             } else if (currentUser.getRole() == UserRole.MANAGER) {
                 System.out.println("2. Room Management");
-                System.out.println("3. Staff Management");
+                System.out.println("3. Housekeeping Management");
                 System.out.println("4. Reports");
                 System.out.println("5. System Settings");
             } else {
@@ -115,7 +119,6 @@ public class MainMenu {
 
             System.out.println("0. Logout");
             System.out.print("\nEnter your choice: ");
-
             String choice = scanner.nextLine();
             handleMainMenuChoice(choice);
         }
@@ -123,7 +126,7 @@ public class MainMenu {
 
     private void login() {
         System.out.print("\nEnter username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine(); 
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
@@ -187,9 +190,27 @@ public class MainMenu {
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
             }
+        } else if (currentUser.getRole() == UserRole.MANAGER) {
+            switch (choice) {
+                case "0":
+                    logout();
+                    break;
+                case "1":
+                    viewProfile();
+                    break;
+                case "2":
+                //zihao
+                    break;
+                    
+                case "3":
+                new HousekeepingMenu(housekeepingService).showMenu();
+                    break;
+                default:
+                    System.out.println("\nInvalid choice. Please try again.");
+                    ConsoleUtils.waitForEnter(scanner);
+            }
         } else {
-            // TODO: Implement other menu options based on user role
-            System.out.println("\nThis feature is not implemented yet.");
+            System.out.println("\nAccess denied. Invalid role.");
             ConsoleUtils.waitForEnter(scanner);
         }
     }
@@ -307,4 +328,4 @@ public class MainMenu {
         if (!found) System.out.println("No bills found.");
         ConsoleUtils.waitForEnter(scanner);
     }
-} 
+}
