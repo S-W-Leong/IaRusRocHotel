@@ -7,6 +7,7 @@ import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.user.Staff;
 import com.hotelmgmt.services.HousekeepingService;
 import com.hotelmgmt.utils.ConsoleUtils;
+import com.hotelmgmt.services.RoomManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,10 +17,12 @@ import java.util.Scanner;
 public class HousekeepingMenu {
     private HousekeepingService housekeepingService;
     private Scanner scanner;
+    private RoomManager roomManager;
 
-    public HousekeepingMenu(HousekeepingService housekeepingService) {
+    public HousekeepingMenu(HousekeepingService housekeepingService, RoomManager roomManager) {
         this.housekeepingService = housekeepingService;
         this.scanner = new Scanner(System.in);
+        this.roomManager = roomManager;
     }
 
     public void showMenu() {
@@ -27,7 +30,7 @@ public class HousekeepingMenu {
             System.out.println("\n--- Housekeeping Management ---");
             System.out.println("1. Assign Task");
             System.out.println("2. List Tasks");
-            System.out.println("3. Update Task Status");1v 
+            System.out.println("3. Update Task Status");
             System.out.println("4. Add Housekeeping Staff");
             System.out.println("5. List Housekeeping Staff");
             System.out.println("6. Remove Housekeeping Staff");
@@ -73,10 +76,17 @@ public class HousekeepingMenu {
             System.out.println("Task ID cannot be empty. Please try again.");
         }
 
-        // Get room number
+        // Get room from RoomManager
         System.out.print("Enter room number: ");
         String roomNumber = scanner.nextLine();
-        Room room = new Room(roomNumber, RoomType.STANDARD, new BigDecimal("100"), 1);
+        Room room = roomManager.getRooms().stream()
+            .filter(r -> r.getRoomNumber().equals(roomNumber))
+            .findFirst()
+            .orElse(null);
+        if (room == null) {
+            System.out.println("Room not found. Please try again.");
+            return;
+        }
 
         // Get staff selection
         List<Staff> availableStaff = housekeepingService.getHousekeepingStaff();

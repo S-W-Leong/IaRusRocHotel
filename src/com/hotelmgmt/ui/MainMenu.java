@@ -238,7 +238,7 @@ public class MainMenu {
                     roomManager.manageRooms();
                     break;
                 case "3":
-                    new HousekeepingMenu(housekeepingService).showMenu();
+                    new HousekeepingMenu(housekeepingService, roomManager).showMenu();
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
