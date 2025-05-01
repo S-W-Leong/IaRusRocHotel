@@ -35,14 +35,28 @@ public class HousekeepingMenu {
             System.out.print("Select option: ");
             int choice = Integer.parseInt(scanner.nextLine());
             switch (choice) {
-                case 1: assignTask(); break;
-                case 2: listTasks(); break;
-                case 3: updateTaskStatus(); break;
-                case 4: addStaff(); break;
-                case 5: listStaff(); break;
-                case 6: removeStaff(); break;
-                case 0: return;
-                default: System.out.println("Invalid option.");
+                case 1:
+                    assignTask();
+                    break;
+                case 2:
+                    listTasks();
+                    break;
+                case 3:
+                    updateTaskStatus();
+                    break;
+                case 4:
+                    addStaff();
+                    break;
+                case 5:
+                    listStaff();
+                    break;
+                case 6:
+                    removeStaff();
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid option.");
             }
         }
     }
@@ -59,10 +73,41 @@ public class HousekeepingMenu {
             System.out.println("Task ID cannot be empty. Please try again.");
         }
 
-        // Create room with valid RoomType to avoid NullPointerException
-        Room room = new Room("101", RoomType.STANDARD, new BigDecimal("100"), 1);
-        Staff staff = new Staff("hkuser", "pass", "John", "Doe", "hk@hotel.com", "1234567890", null, "E001", java.time.LocalDate.now(), "Housekeeping");
-        housekeepingService.addStaff(staff);
+        // Get room number
+        System.out.print("Enter room number: ");
+        String roomNumber = scanner.nextLine();
+        Room room = new Room(roomNumber, RoomType.STANDARD, new BigDecimal("100"), 1);
+
+        // Get staff selection
+        List<Staff> availableStaff = housekeepingService.getHousekeepingStaff();
+        if (availableStaff.isEmpty()) {
+            System.out.println("No housekeeping staff available. Please add staff first.");
+            return;
+        }
+
+        System.out.println("\nAvailable Housekeeping Staff:");
+        for (int i = 0; i < availableStaff.size(); i++) {
+            Staff s = availableStaff.get(i);
+            System.out.printf("%d. %s (ID: %s)\n",
+                    i + 1,
+                    s.getFirstName(),
+                    s.getEmployeeId());
+        }
+
+        Staff selectedStaff = null;
+        while (selectedStaff == null) {
+            System.out.print("\nSelect staff member (1-" + availableStaff.size() + "): ");
+            try {
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection > 0 && selection <= availableStaff.size()) {
+                    selectedStaff = availableStaff.get(selection - 1);
+                } else {
+                    System.out.println("Invalid selection. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
 
         // Get valid scheduled time
         LocalDateTime scheduledTime;
@@ -80,32 +125,65 @@ public class HousekeepingMenu {
             }
         }
 
-        housekeepingService.assignTask(taskId, room, staff, scheduledTime);
-        System.out.println("Task assigned.");
+        housekeepingService.assignTask(taskId, room, selectedStaff, scheduledTime);
+        System.out.println("Task assigned to " + selectedStaff.getFirstName() +
+                " for Room " + room.getRoomNumber());
     }
 
     private void listTasks() {
         List<HousekeepingTask> tasks = housekeepingService.getTasks();
-        for (HousekeepingTask task : tasks) {
-            System.out.println("Task ID: " + task.getTaskId() + 
-                             ", Room: " + task.getRoom().getRoomNumber() + 
-                             ", Staff: " + task.getAssignedStaff().getFirstName() + 
-                             ", Status: " + task.getStatus() + 
-                             ", Scheduled Time: " + task.getScheduledTime() +
-                             ", Notes: " + task.getProgressNotes());
+
+        System.out.println("\n=== Housekeeping Tasks ===");
+
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks currently assigned.");
+        } else {
+            for (HousekeepingTask task : tasks) {
+                System.out.println("\nTask ID: " + task.getTaskId());
+                System.out.println("Room Number: " + task.getRoom().getRoomNumber());
+                System.out.println("Assigned Staff: " + task.getAssignedStaff().getFirstName());
+                System.out.println("Status: " + task.getStatus());
+                System.out.println("Scheduled Time: " + task.getScheduledTime());
+                System.out.println("Notes: " + task.getProgressNotes());
+                System.out.println("-------------------");
+            }
         }
     }
 
     private void updateTaskStatus() {
-        // Get valid task ID
-        String taskId;
-        while (true) {
-            System.out.print("Enter Task ID: ");
-            taskId = scanner.nextLine();
-            if (taskId != null && !taskId.trim().isEmpty()) {
-                break;
+        List<HousekeepingTask> tasks = housekeepingService.getTasks();
+
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks currently assigned.");
+            return;
+        }
+
+        // Display available tasks
+        System.out.println("\nAvailable Tasks:");
+        for (int i = 0; i < tasks.size(); i++) {
+            HousekeepingTask task = tasks.get(i);
+            System.out.printf("%d. Task ID: %s - Room %s - Staff: %s - Status: %s%n",
+                    i + 1,
+                    task.getTaskId(),
+                    task.getRoom().getRoomNumber(),
+                    task.getAssignedStaff().getFirstName(),
+                    task.getStatus());
+        }
+
+        // Get valid task selection
+        HousekeepingTask selectedTask = null;
+        while (selectedTask == null) {
+            System.out.print("\nSelect task number to update (1-" + tasks.size() + "): ");
+            try {
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection > 0 && selection <= tasks.size()) {
+                    selectedTask = tasks.get(selection - 1);
+                } else {
+                    System.out.println("Invalid selection. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
             }
-            System.out.println("Task ID cannot be empty. Please try again.");
         }
 
         // Get valid task status
@@ -117,15 +195,24 @@ public class HousekeepingMenu {
             System.out.println("3. COMPLETED    - Task has been finished");
             System.out.println("4. CANCELLED    - Task has been cancelled");
             System.out.print("\nEnter status number (1-4): ");
-            
+
             String input = scanner.nextLine();
             try {
                 switch (input) {
-                    case "1": status = TaskStatus.PENDING; break;
-                    case "2": status = TaskStatus.IN_PROGRESS; break; 
-                    case "3": status = TaskStatus.COMPLETED; break;
-                    case "4": status = TaskStatus.CANCELLED; break;
-                    default: throw new IllegalArgumentException();
+                    case "1":
+                        status = TaskStatus.PENDING;
+                        break;
+                    case "2":
+                        status = TaskStatus.IN_PROGRESS;
+                        break;
+                    case "3":
+                        status = TaskStatus.COMPLETED;
+                        break;
+                    case "4":
+                        status = TaskStatus.CANCELLED;
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
                 }
                 break;
             } catch (IllegalArgumentException e) {
@@ -137,8 +224,8 @@ public class HousekeepingMenu {
         System.out.print("Enter progress notes (optional): ");
         String notes = scanner.nextLine();
 
-        housekeepingService.updateTaskStatus(taskId, status, notes);
-        System.out.println("Task status updated.");
+        housekeepingService.updateTaskStatus(selectedTask.getTaskId(), status, notes);
+        System.out.println("Task status updated successfully.");
     }
 
     private void addStaff() {
@@ -148,7 +235,8 @@ public class HousekeepingMenu {
         String firstName = scanner.nextLine();
         System.out.print("Enter last name: ");
         String lastName = scanner.nextLine();
-        Staff staff = new Staff(username, "pass", firstName, lastName, username+"@hotel.com", "1234567890", null, "E"+System.currentTimeMillis(), java.time.LocalDate.now(), "Housekeeping");
+        Staff staff = new Staff(username, "pass", firstName, lastName, username + "@hotel.com", "1234567890", null,
+                "E" + System.currentTimeMillis(), java.time.LocalDate.now(), "Housekeeping");
         housekeepingService.addStaff(staff);
         System.out.println("Staff added.");
     }
@@ -156,14 +244,15 @@ public class HousekeepingMenu {
     private void listStaff() {
         List<Staff> staffList = housekeepingService.getHousekeepingStaff();
         for (Staff staff : staffList) {
-            System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
+            System.out.println(
+                    "Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
         }
     }
 
     private void removeStaff() {
         System.out.print("Enter employee ID of staff to remove: ");
         String employeeId = scanner.nextLine();
-        
+
         if (housekeepingService.removeStaff(employeeId)) {
             System.out.println("Staff member successfully removed.");
         } else {
