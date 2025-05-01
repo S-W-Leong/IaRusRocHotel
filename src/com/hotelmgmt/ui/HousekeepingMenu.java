@@ -85,17 +85,51 @@ public class HousekeepingMenu {
     private void listTasks() {
         List<HousekeepingTask> tasks = housekeepingService.getTasks();
         for (HousekeepingTask task : tasks) {
-            System.out.println("Task ID: " + task.getTaskId() + ", Room: " + task.getRoom().getRoomNumber() + ", Staff: " + task.getAssignedStaff().getFirstName() + ", Status: " + task.getStatus() + ", Notes: " + task.getProgressNotes());
+            System.out.println("Task ID: " + task.getTaskId() + 
+                             ", Room: " + task.getRoom().getRoomNumber() + 
+                             ", Staff: " + task.getAssignedStaff().getFirstName() + 
+                             ", Status: " + task.getStatus() + 
+                             ", Scheduled Time: " + task.getScheduledTime() +
+                             ", Notes: " + task.getProgressNotes());
         }
     }
 
     private void updateTaskStatus() {
-        System.out.print("Enter Task ID: ");
-        String taskId = scanner.nextLine();
-        System.out.print("Enter new status (PENDING, IN_PROGRESS, COMPLETED, CANCELLED): ");
-        TaskStatus status = TaskStatus.valueOf(scanner.nextLine());
-        System.out.print("Enter progress notes: ");
-        String notes = scanner.nextLine();
+        // Get valid task ID
+        String taskId;
+        while (true) {
+            System.out.print("Enter Task ID: ");
+            taskId = scanner.nextLine();
+            if (taskId != null && !taskId.trim().isEmpty()) {
+                break;
+            }
+            System.out.println("Task ID cannot be empty. Please try again.");
+        }
+
+        // Get valid task status
+        TaskStatus status;
+        while (true) {
+            System.out.print("Enter new status (PENDING, IN_PROGRESS, COMPLETED, CANCELLED): ");
+            String statusInput = scanner.nextLine();
+            try {
+                status = TaskStatus.valueOf(statusInput.toUpperCase());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid status. Please enter one of: PENDING, IN_PROGRESS, COMPLETED, CANCELLED");
+            }
+        }
+
+        // Get valid notes
+        String notes;
+        while (true) {
+            System.out.print("Enter progress notes: ");
+            notes = scanner.nextLine();
+            if (notes != null && !notes.trim().isEmpty()) {
+                break;
+            }
+            System.out.println("Progress notes cannot be empty. Please try again.");
+        }
+
         housekeepingService.updateTaskStatus(taskId, status, notes);
         System.out.println("Task status updated.");
     }
