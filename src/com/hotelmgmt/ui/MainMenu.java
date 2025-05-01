@@ -1,31 +1,28 @@
 package com.hotelmgmt.ui;
 
-import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.List;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import com.hotelmgmt.utils.ConsoleUtils;
-import com.hotelmgmt.models.user.User;
-import com.hotelmgmt.models.user.UserRole;
-import com.hotelmgmt.models.user.Guest;
+import com.hotelmgmt.models.billing.Invoice;
+import com.hotelmgmt.models.reservation.Reservation;
 import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
-import com.hotelmgmt.models.roomService.RoomServiceStatus;
-import com.hotelmgmt.models.room.RoomStatus;
-import com.hotelmgmt.models.reservation.Reservation;
-import com.hotelmgmt.models.reservation.ReservationStatus;
-import com.hotelmgmt.models.billing.Invoice;
-import com.hotelmgmt.models.billing.PaymentStatus;
+import com.hotelmgmt.models.user.Guest;
+import com.hotelmgmt.models.user.User;
+import com.hotelmgmt.models.user.UserRole;
 import com.hotelmgmt.services.AuthenticationService;
 import com.hotelmgmt.services.BookingManager;
-import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.PaymentService;
+import com.hotelmgmt.services.RegisterRequirement;
 import com.hotelmgmt.services.ReservationService;
 import com.hotelmgmt.services.RoomService;
+import com.hotelmgmt.services.RoomServiceManager;
+import com.hotelmgmt.utils.ConsoleUtils;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
@@ -138,19 +135,53 @@ public class MainMenu {
     }
 
     private void register() {
+        ConsoleUtils.clearScreen();
+        RegisterRequirement.displayRequirements();
+        System.out.println("\nPress Enter to continue with registration...");
+        scanner.nextLine();
+        
         System.out.println("\nGuest Registration");
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
+        
+        String username;
+        do {
+            System.out.print("Enter username: ");
+            username = scanner.nextLine();
+            if (!RegisterRequirement.isValidUsername(username)) {
+                System.out.println("Invalid username! Only letters, numbers, and underscore are allowed.");
+            }
+        } while (!RegisterRequirement.isValidUsername(username));
+
+        String password;
+        do {
+            System.out.print("Enter password: ");
+            password = scanner.nextLine();
+            if (!RegisterRequirement.isValidPassword(password)) {
+                System.out.println("Invalid password! Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.");
+            }
+        } while (!RegisterRequirement.isValidPassword(password));
+
         System.out.print("Enter first name: ");
         String firstName = scanner.nextLine();
         System.out.print("Enter last name: ");
         String lastName = scanner.nextLine();
-        System.out.print("Enter email: ");
-        String email = scanner.nextLine();
-        System.out.print("Enter phone number: ");
-        String phone = scanner.nextLine();
+
+        String email;
+        do {
+            System.out.print("Enter email: ");
+            email = scanner.nextLine();
+            if (!RegisterRequirement.isValidEmail(email)) {
+                System.out.println("Invalid email format! Please enter a valid email address.");
+            }
+        } while (!RegisterRequirement.isValidEmail(email));
+
+        String phone;
+        do {
+            System.out.print("Enter phone number: ");
+            phone = scanner.nextLine();
+            if (!RegisterRequirement.isValidPhone(phone)) {
+                System.out.println("Invalid phone number format! Please enter a valid phone number.");
+            }
+        } while (!RegisterRequirement.isValidPhone(phone));
 
         try {
             currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone);
