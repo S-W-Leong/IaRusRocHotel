@@ -30,6 +30,7 @@ public class HousekeepingMenu {
             System.out.println("3. Update Task Status");
             System.out.println("4. Add Housekeeping Staff");
             System.out.println("5. List Housekeeping Staff");
+            System.out.println("6. Remove Housekeeping Staff");
             System.out.println("0. Exit");
             System.out.print("Select option: ");
             int choice = Integer.parseInt(scanner.nextLine());
@@ -39,6 +40,7 @@ public class HousekeepingMenu {
                 case 3: updateTaskStatus(); break;
                 case 4: addStaff(); break;
                 case 5: listStaff(); break;
+                case 6: removeStaff(); break;
                 case 0: return;
                 default: System.out.println("Invalid option.");
             }
@@ -155,6 +157,17 @@ public class HousekeepingMenu {
         List<Staff> staffList = housekeepingService.getHousekeepingStaff();
         for (Staff staff : staffList) {
             System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
+        }
+    }
+
+    private void removeStaff() {
+        System.out.print("Enter employee ID of staff to remove: ");
+        String employeeId = scanner.nextLine();
+        
+        if (housekeepingService.removeStaff(employeeId)) {
+            System.out.println("Staff member successfully removed.");
+        } else {
+            System.out.println("Staff member not found or could not be removed.");
         }
     }
 }
