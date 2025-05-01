@@ -1,13 +1,13 @@
 package com.hotelmgmt.models.roomService;
 
+import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.user.Guest;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.hotelmgmt.models.user.Guest;
-import com.hotelmgmt.models.room.Room;
 
 public class RoomServiceOrder implements Serializable {
     private String id;

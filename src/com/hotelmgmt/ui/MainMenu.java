@@ -18,6 +18,7 @@ import com.hotelmgmt.services.BookingManager;
 import com.hotelmgmt.services.HousekeepingService;
 import com.hotelmgmt.services.PaymentService;
 import com.hotelmgmt.services.RegisterRequirement;
+import com.hotelmgmt.services.Report;
 import com.hotelmgmt.services.ReservationService;
 import com.hotelmgmt.services.RoomManager;
 import com.hotelmgmt.services.RoomService;
@@ -25,6 +26,7 @@ import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.ViewProfile;
 import com.hotelmgmt.utils.ConsoleUtils;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -110,6 +112,7 @@ public class MainMenu {
                 System.out.println("2. Room Booking");
                 System.out.println("3. My Reservations");
                 System.out.println("4. Room Service");
+                System.out.println("5. View Bills");
             } else if (currentUser.getRole() == UserRole.MANAGER) {
                 System.out.println("2. Room Management");
                 System.out.println("3. Housekeeping Management");
@@ -118,6 +121,7 @@ public class MainMenu {
             } else {
                 System.out.println("2. Room Status");
                 System.out.println("3. Tasks");
+                System.out.println("4. Reports");
             }
 
             System.out.println("0. Logout");
@@ -220,6 +224,9 @@ public class MainMenu {
                 case "4":
                     orderRoomService();
                     break;
+                case "5":
+                    viewBills();
+                    break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
@@ -238,6 +245,12 @@ public class MainMenu {
                 case "3":
                     new HousekeepingMenu(housekeepingService, roomManager).showMenu();
                     break;
+                case "4":
+                    showReportMenu();
+                    break;
+                case "5":
+                    // System Settings
+                    break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
@@ -251,10 +264,13 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                    //room status
+                    // Room Status
                     break;
                 case "3":
-                    //tasks
+                    // Tasks
+                    break;
+                case "4":
+                    showReportMenu();
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
@@ -602,40 +618,137 @@ public class MainMenu {
     }
 
     private void orderRoomService() {
-        System.out.println("\n--- Room Service Menu ---");
-        for (int i = 0; i < menuItems.size(); i++) {
-            System.out.println((i+1) + ". " + menuItems.get(i));
-        }
-        System.out.print("Select menu item (number): ");
-        String input = scanner.nextLine();
-        int idx;
-        try {
-            idx = Integer.parseInt(input) - 1;
-            if (idx < 0 || idx >= menuItems.size()) throw new Exception();
-        } catch (Exception e) {
-            System.out.println("Invalid selection.");
-            ConsoleUtils.waitForEnter(scanner);
-            return;
-        }
-        MenuItem selectedItem = menuItems.get(idx);
-        // Find guest's checked-in reservation
-        Reservation checkedIn = null;
-        for (Reservation r : reservationService.getAllReservations()) {
-            if (r.getGuest().getUsername().equals(currentUser.getUsername()) && r.getStatus() == ReservationStatus.CHECKED_IN) {
-                checkedIn = r;
+        // Check if guest is checked in
+        Reservation checkedInReservation = null;
+        for (Reservation reservation : reservations) {
+            if (reservation.getGuest().equals(currentUser) && 
+                reservation.getStatus() == com.hotelmgmt.models.reservation.ReservationStatus.CHECKED_IN) {
+                checkedInReservation = reservation;
                 break;
             }
         }
-        if (checkedIn == null) {
-            System.out.println("You must be checked in to order room service.");
+
+        if (checkedInReservation == null) {
+            System.out.println("\nYou must be checked in to order room service.");
             ConsoleUtils.waitForEnter(scanner);
             return;
         }
-        List<MenuItem> orderItems = new ArrayList<>();
-        orderItems.add(selectedItem);
-        RoomServiceOrder order = roomServiceManager.placeOrder((Guest)currentUser, checkedIn.getRoom(), orderItems, "");
-        System.out.println("Room service order placed! Order ID: " + order.getId());
-        System.out.println("Charges will be added to your bill and payable at check-out.");
-        ConsoleUtils.waitForEnter(scanner);
+
+        // Get all menu items
+        List<MenuItem> menuItems = MenuItem.initializeMenuItems();
+        
+        while (true) {
+            ConsoleUtils.clearScreen();
+            System.out.println("\n--- Room Service Menu ---");
+            
+            // Display all menu items
+            System.out.println("\nAvailable Items:");
+            for (MenuItem item : menuItems) {
+                System.out.printf("%s. %s - $%.2f\n", item.getId(), item.getName(), item.getPrice());
+            }
+            
+            System.out.println("\n0. Back to Main Menu");
+            System.out.print("\nSelect item: ");
+            String itemChoice = scanner.nextLine();
+            
+            if (itemChoice.equals("0")) {
+                return;
+            }
+            
+            // Find selected item
+            MenuItem selectedItem = menuItems.stream()
+                .filter(item -> item.getId().equals(itemChoice))
+                .findFirst()
+                .orElse(null);
+                
+            if (selectedItem == null) {
+                System.out.println("Invalid item selection.");
+                ConsoleUtils.waitForEnter(scanner);
+                continue;
+            }
+            
+            // Get special instructions
+            System.out.print("Special instructions (press Enter for none): ");
+            String instructions = scanner.nextLine();
+            
+            // Create order
+            List<MenuItem> orderItems = new ArrayList<>();
+            orderItems.add(selectedItem);
+            
+            RoomServiceOrder order = roomServiceManager.placeOrder(
+                (Guest) currentUser,
+                checkedInReservation.getRoom(),
+                orderItems,
+                instructions
+            );
+            
+            System.out.println("\nOrder placed successfully!");
+            System.out.println("Order ID: " + order.getId());
+            System.out.println("Status: " + order.getStatus());
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
+    private void viewBills() {
+        // Implementation of viewBills method
+    }
+
+    private void showReportMenu() {
+        while (true) {
+            ConsoleUtils.clearScreen();
+            System.out.println("\n=== Report Menu ===");
+            System.out.println("1. Room Occupancy Analysis");
+            System.out.println("2. Revenue Analysis");
+            System.out.println("3. Guest Analysis");
+            System.out.println("4. Room Service Analysis");
+            System.out.println("5. Comprehensive Report");
+            System.out.println("0. Back to Main Menu");
+            
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
+            
+            if (choice.equals("0")) {
+                return;
+            }
+            
+            System.out.print("\nEnter start date (YYYY-MM-DD): ");
+            String startDateStr = scanner.nextLine();
+            System.out.print("Enter end date (YYYY-MM-DD): ");
+            String endDateStr = scanner.nextLine();
+            
+            try {
+                LocalDate startDate = LocalDate.parse(startDateStr);
+                LocalDate endDate = LocalDate.parse(endDateStr);
+                
+                Report reportAnalyse = new Report(reservations, rooms, roomServices, invoices);
+                
+                switch (choice) {
+                    case "1":
+                        reportAnalyse.analyzeRoomPopularity(startDate, endDate);
+                        break;
+                    case "2":
+                        reportAnalyse.generateFinancialReport(startDate, endDate);
+                        break;
+                    case "3":
+                        // Guest analysis is not implemented yet
+                        System.out.println("Guest analysis feature is not available yet.");
+                        break;
+                    case "4":
+                        // Room service analysis is not implemented yet
+                        System.out.println("Room service analysis feature is not available yet.");
+                        break;
+                    case "5":
+                        reportAnalyse.generateComprehensiveReport(startDate, endDate);
+                        break;
+                    default:
+                        System.out.println("Invalid choice.");
+                }
+                
+                ConsoleUtils.waitForEnter(scanner);
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+                ConsoleUtils.waitForEnter(scanner);
+            }
+        }
     }
 }
