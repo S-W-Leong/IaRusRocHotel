@@ -3,6 +3,7 @@ package com.hotelmgmt.ui;
 import com.hotelmgmt.models.billing.Invoice;
 import com.hotelmgmt.models.reservation.Reservation;
 import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.room.RoomData;
 import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
@@ -30,7 +31,7 @@ public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
     private User currentUser;
-    private final List<Room> rooms = new ArrayList<>();
+    private final List<Room> rooms;
     private final List<Reservation> reservations = new ArrayList<>();
     private final List<RoomServiceOrder> roomServices = new ArrayList<>();
     private final List<MenuItem> menuItems = new ArrayList<>();
@@ -46,7 +47,7 @@ public class MainMenu {
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
         this.authService = new AuthenticationService();
-        seedRooms();
+        this.rooms = RoomData.getRooms();
         seedMenuItems();
         this.roomService = new RoomService(rooms);
         this.reservationService = new ReservationService();
@@ -116,7 +117,6 @@ public class MainMenu {
             } else {
                 System.out.println("2. Room Status");
                 System.out.println("3. Tasks");
-                System.out.println("4. Reports");
             }
 
             System.out.println("0. Logout");
@@ -258,9 +258,6 @@ public class MainMenu {
                 case "3":
                     //tasks
                     break;
-                case "4":
-                    //reports
-                    break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
@@ -274,37 +271,6 @@ public class MainMenu {
         ConsoleUtils.waitForEnter(scanner);
     }
 
-    // Seed some rooms
-    private void seedRooms() {
-        // Standard Rooms (20 rooms)
-        for (int i = 1; i <= 20; i++) {
-            String roomNumber = String.format("SD%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.STANDARD, new BigDecimal("200"), 1));
-        }
-
-        // Deluxe Rooms (15 rooms)
-        for (int i = 1; i <= 15; i++) {
-            String roomNumber = String.format("DX%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.DELUXE, new BigDecimal("350"), 2));
-        }
-
-        // Suite Rooms (10 rooms)
-        for (int i = 1; i <= 10; i++) {
-            String roomNumber = String.format("ST%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.SUITE, new BigDecimal("400"), 3));
-        }
-
-        // Executive Rooms (5 rooms)
-        for (int i = 1; i <= 5; i++) {
-            String roomNumber = String.format("ET%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.EXECUTIVE_SUITE, new BigDecimal("500"), 4));
-        }
-
-        // Presidential Room (1 room)
-        rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("800"), 5));
-    }
-
-    // Seed some menu items
     private void seedMenuItems() {
         menuItems.add(new MenuItem("1", "Club Sandwich", "Grilled chicken sandwich", new BigDecimal("12.50"), MenuCategory.LUNCH));
         menuItems.add(new MenuItem("2", "Pancakes", "Stack of pancakes with syrup", new BigDecimal("8.00"), MenuCategory.BREAKFAST));

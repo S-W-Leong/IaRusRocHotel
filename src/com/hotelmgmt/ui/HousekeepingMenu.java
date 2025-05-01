@@ -83,12 +83,23 @@ public class HousekeepingMenu {
             int floor = Integer.parseInt(inputRoomNumber.substring(0, 1));
             String prefix;
             switch (floor) {
-                case 1: prefix = "SD"; break;
-                case 2: prefix = "DX"; break;
-                case 3: prefix = "ST"; break;
-                case 4: prefix = "ET"; break;
-                case 5: prefix = "PE"; break;
-                default: prefix = "";
+                case 1: 
+                    prefix = "SD"; 
+                    break;
+                case 2: 
+                    prefix = "DX";
+                    break;
+                case 3: 
+                    prefix = "ST"; 
+                    break;
+                case 4: 
+                    prefix = "ET"; 
+                    break;
+                case 5: 
+                    prefix = "PE"; 
+                    break;
+                default: 
+                    prefix = "";
             }
             formattedRoomNumber = prefix + inputRoomNumber;
         } else {

@@ -1,11 +1,10 @@
 package com.hotelmgmt.services;
 
 import com.hotelmgmt.models.room.Room;
-import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.room.RoomStatus;
+import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.utils.ConsoleUtils;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -48,12 +47,12 @@ public class RoomManager {
 
     private void viewAllRooms() {
         ConsoleUtils.clearScreen();
-        System.out.println("\n╔═════════════════════════════════ Room List ══════════════════════════════════════╗");
-        System.out.println("║  Room No.  │      Type      │     Status     │  Floor  │ Price (RM) │  Cleaning  ║");
-        System.out.println("╠════════════╪════════════════╪════════════════╪═════════╪════════════╪════════════╣");
+        System.out.println("\n╔════════════════════════════════════ Room List ══════════════════════════════════════════╗");
+        System.out.println("║  Room No.  │      Type      │         Status        │  Floor  │ Price (RM) │  Cleaning  ║");
+        System.out.println("╠════════════╪════════════════╪═══════════════════════╪═════════╪════════════╪════════════╣");
         
         for (Room room : rooms) {
-            System.out.printf("║   %-8s │  %-12s  │   %-10s   │    %-3d  │   %-6.2f   │     %-3s    ║\n",
+            System.out.printf("║   %-8s │  %-12s  │   %-17s   │    %-3d  │   %-6.2f   │     %-3s    ║\n",
                 room.getRoomNumber(),
                 room.getType().toString().replace("_SUITE", ""),
                 room.getStatus(),
@@ -62,22 +61,30 @@ public class RoomManager {
                 room.isNeedsCleaning() ? "YES" : "NO");
         }
         
-        System.out.println("╚════════════╧════════════════╧════════════════╧═════════╧════════════╧════════════╝");
+        System.out.println("╚════════════╧════════════════╧═══════════════════════╧═════════╧════════════╧════════════╝");
         System.out.println("\nTotal Rooms: " + rooms.size());
         ConsoleUtils.waitForEnter(scanner);
     }
 
     private void addNewRoom() {
         ConsoleUtils.clearScreen();
-        System.out.println("\n--- Add New Room ---");
-        
+        System.out.println("\n         Add New Room        ");
+        System.out.println("═════════════════════════════");
+        displayRoomRequirements();
+
         System.out.print("Enter room number: ");
         String roomNumber = scanner.nextLine();
         
-        System.out.println("\nAvailable Room Types:");
-        for (RoomType type : RoomType.values()) {
-            System.out.println(type);
+        // Check if room number already exists
+        boolean roomExists = rooms.stream()
+            .anyMatch(room -> room.getRoomNumber().equals(roomNumber));
+            
+        if (roomExists) {
+            System.out.println("\nError: Room number " + roomNumber + " is already in use. Please choose another.");
+            ConsoleUtils.waitForEnter(scanner);
+            return;
         }
+        
         System.out.print("Enter room type: ");
         String roomType = scanner.nextLine();
         
@@ -91,8 +98,30 @@ public class RoomManager {
         Room newRoom = new Room(roomNumber, RoomType.valueOf(roomType.toUpperCase()), price, floor);
         rooms.add(newRoom);
         
-        System.out.println("\nRoom added successfully!");
+        System.out.println("\nRoom " + roomNumber + " has been added successfully!");
         ConsoleUtils.waitForEnter(scanner);
+    }
+
+    public static void displayRoomRequirements() {
+        System.out.println("\n════════════════════════════════════════════════════════════════════════════════");
+        System.out.println("                           ROOM NUMBER FORMAT                              ");
+        System.out.println("════════════════════════════════════════════════════════════════════════════════");
+        System.out.println("╔══════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║ Room Number Format:                                                          ║");
+        System.out.println("║ - Format: TTFRR (TT=Type, F=Floor, RR=Room)                                  ║");
+        System.out.println("║ - Example: SD101 (Type=SD, Floor=1, Room=01)                                 ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Room Type Codes:                                                             ║");
+        System.out.println("║ - STANDARD Room = SD                                                         ║");
+        System.out.println("║ - DELUXE Room = DX                                                           ║");
+        System.out.println("║ - SUITE Room = ST                                                            ║");
+        System.out.println("║ - EXECUTIVE SUITE Room = ET                                                  ║");
+        System.out.println("║ - PRESIDENTIAL SUITE Room = PE                                               ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Floor Numbers:                                                               ║");
+        System.out.println("║ - Floors 1-5 available for all room types                                    ║");
+        System.out.println("║ - Each floor can have multiple room types                                    ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
     }
 
     private void updateRoomStatus() {
