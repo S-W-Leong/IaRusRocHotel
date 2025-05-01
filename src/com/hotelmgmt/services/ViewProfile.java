@@ -31,11 +31,8 @@ public class ViewProfile {
         System.out.println("║                                                                                ║");
         System.out.println("║   Contact Information:                                                         ║");
         System.out.println("║                                                                                ║");
-        if (user instanceof Guest) {
-            Guest guest = (Guest) user;
-            System.out.println("║     - Email: " + String.format("%-66s", guest.getEmail()) + "║");
-            System.out.println("║     - Phone: " + String.format("%-66s", guest.getPhoneNumber()) + "║");
-        }
+        System.out.println("║     - Email: " + String.format("%-66s", user.getEmail()) + "║");
+        System.out.println("║     - Phone: " + String.format("%-66s", user.getPhoneNumber()) + "║");
         System.out.println("║                                                                                ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════════╝");
         ConsoleUtils.waitForEnter(scanner);

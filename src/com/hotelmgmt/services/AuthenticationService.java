@@ -1,12 +1,12 @@
 package com.hotelmgmt.services;
 
+import com.hotelmgmt.models.user.Guest;
+import com.hotelmgmt.models.user.Staff;
+import com.hotelmgmt.models.user.User;
+import com.hotelmgmt.models.user.UserRole;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import com.hotelmgmt.models.user.User;
-import com.hotelmgmt.models.user.Guest;
-import com.hotelmgmt.models.user.Staff;
-import com.hotelmgmt.models.user.UserRole;
 
 public class AuthenticationService {
     private final Map<String, User> users;
@@ -20,7 +20,7 @@ public class AuthenticationService {
     private void createDefaultUsers() {
         // Create a manager
         Staff manager = new Staff("admin", "admin123", "System", "Admin", 
-            "admin@hotel.com", "1234567890", UserRole.MANAGER, "EMP001",
+            "system.admin@hotel.com", "9876543210", UserRole.MANAGER, "EMP001",
             LocalDate.now(), "Management");
         users.put(manager.getUsername(), manager);
 

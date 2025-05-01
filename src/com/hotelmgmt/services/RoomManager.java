@@ -49,11 +49,11 @@ public class RoomManager {
     private void viewAllRooms() {
         ConsoleUtils.clearScreen();
         System.out.println("\n╔═════════════════════════════════ Room List ══════════════════════════════════════╗");
-        System.out.println("║  Room No.  │      Type      │     Status     │  Floor  │    Price   │  Cleaning  ║");
+        System.out.println("║  Room No.  │      Type      │     Status     │  Floor  │ Price (RM) │  Cleaning  ║");
         System.out.println("╠════════════╪════════════════╪════════════════╪═════════╪════════════╪════════════╣");
         
         for (Room room : rooms) {
-            System.out.printf("║   %-8s │  %-12s  │   %-10s   │    %-3d  │   $%-6.2f  │     %-3s    ║\n",
+            System.out.printf("║   %-8s │  %-12s  │   %-10s   │    %-3d  │   %-6.2f   │     %-3s    ║\n",
                 room.getRoomNumber(),
                 room.getType().toString().replace("_SUITE", ""),
                 room.getStatus(),

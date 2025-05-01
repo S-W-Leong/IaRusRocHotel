@@ -279,29 +279,29 @@ public class MainMenu {
         // Standard Rooms (20 rooms)
         for (int i = 1; i <= 20; i++) {
             String roomNumber = String.format("SD%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.STANDARD, new BigDecimal("100"), 1));
+            rooms.add(new Room(roomNumber, RoomType.STANDARD, new BigDecimal("200"), 1));
         }
 
         // Deluxe Rooms (15 rooms)
         for (int i = 1; i <= 15; i++) {
             String roomNumber = String.format("DX%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.DELUXE, new BigDecimal("150"), 2));
+            rooms.add(new Room(roomNumber, RoomType.DELUXE, new BigDecimal("350"), 2));
         }
 
         // Suite Rooms (10 rooms)
         for (int i = 1; i <= 10; i++) {
             String roomNumber = String.format("ST%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.SUITE, new BigDecimal("250"), 3));
+            rooms.add(new Room(roomNumber, RoomType.SUITE, new BigDecimal("400"), 3));
         }
 
         // Executive Rooms (5 rooms)
         for (int i = 1; i <= 5; i++) {
             String roomNumber = String.format("ET%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.EXECUTIVE_SUITE, new BigDecimal("350"), 4));
+            rooms.add(new Room(roomNumber, RoomType.EXECUTIVE_SUITE, new BigDecimal("500"), 4));
         }
 
         // Presidential Room (1 room)
-        rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("500"), 5));
+        rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("800"), 5));
     }
 
     // Seed some menu items

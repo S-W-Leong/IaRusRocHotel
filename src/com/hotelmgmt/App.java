@@ -1,12 +1,10 @@
 package com.hotelmgmt;
 
-import com.hotelmgmt.ui.Logo;
 import com.hotelmgmt.ui.MainMenu;
 import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
-        Logo.display();
         System.out.println("Welcome to Hotel Management System");
         System.out.println("================================");
 
