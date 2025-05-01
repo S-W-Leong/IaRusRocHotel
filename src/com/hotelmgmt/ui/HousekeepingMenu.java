@@ -3,10 +3,12 @@ package com.hotelmgmt.ui;
 import com.hotelmgmt.models.housekeeping.HousekeepingTask;
 import com.hotelmgmt.models.housekeeping.TaskStatus;
 import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.user.Staff;
 import com.hotelmgmt.services.HousekeepingService;
 import com.hotelmgmt.utils.ConsoleUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -44,14 +46,38 @@ public class HousekeepingMenu {
     }
 
     private void assignTask() {
-        System.out.print("Enter Task ID: ");
-        String taskId = scanner.nextLine();
-        // For demo, create a dummy room and staff
-        Room room = new Room("101", null, null, 1);
+        // Get valid task ID
+        String taskId;
+        while (true) {
+            System.out.print("Enter Task ID: ");
+            taskId = scanner.nextLine();
+            if (taskId != null && !taskId.trim().isEmpty()) {
+                break;
+            }
+            System.out.println("Task ID cannot be empty. Please try again.");
+        }
+
+        // Create room with valid RoomType to avoid NullPointerException
+        Room room = new Room("101", RoomType.STANDARD, new BigDecimal("100"), 1);
         Staff staff = new Staff("hkuser", "pass", "John", "Doe", "hk@hotel.com", "1234567890", null, "E001", java.time.LocalDate.now(), "Housekeeping");
         housekeepingService.addStaff(staff);
-        System.out.print("Enter scheduled time (yyyy-MM-ddTHH:mm): ");
-        LocalDateTime scheduledTime = LocalDateTime.parse(scanner.nextLine());
+
+        // Get valid scheduled time
+        LocalDateTime scheduledTime;
+        while (true) {
+            System.out.print("Enter scheduled time (yyyy-MM-ddTHH:mm): ");
+            String timeInput = scanner.nextLine();
+            try {
+                scheduledTime = LocalDateTime.parse(timeInput);
+                if (!scheduledTime.isBefore(LocalDateTime.now())) {
+                    break;
+                }
+                System.out.println("Scheduled time must be in the future. Please try again.");
+            } catch (Exception e) {
+                System.out.println("Invalid date/time format. Please use yyyy-MM-ddTHH:mm");
+            }
+        }
+
         housekeepingService.assignTask(taskId, room, staff, scheduledTime);
         System.out.println("Task assigned.");
     }
@@ -92,4 +118,4 @@ public class HousekeepingMenu {
             System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
         }
     }
-} 
+}
