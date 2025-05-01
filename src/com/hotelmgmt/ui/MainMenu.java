@@ -16,6 +16,7 @@ import com.hotelmgmt.services.HousekeepingService;
 import com.hotelmgmt.services.PaymentService;
 import com.hotelmgmt.services.RegisterRequirement;
 import com.hotelmgmt.services.ReservationService;
+import com.hotelmgmt.services.RoomManager;
 import com.hotelmgmt.services.RoomService;
 import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.ViewProfile;
@@ -40,6 +41,7 @@ public class MainMenu {
     private final PaymentService paymentService;
     private final BookingManager bookingManager;
     private final HousekeepingService housekeepingService;
+    private final RoomManager roomManager;
 
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
@@ -52,6 +54,7 @@ public class MainMenu {
         this.paymentService = new PaymentService();
         this.bookingManager = new BookingManager(roomService, reservationService, paymentService, roomServiceManager);
         this.housekeepingService = new HousekeepingService();
+        this.roomManager = new RoomManager(rooms);
     }
 
     public void start() {
@@ -232,7 +235,7 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                    //zihao
+                    roomManager.manageRooms();
                     break;
                 case "3":
                     new HousekeepingMenu(housekeepingService).showMenu();
@@ -273,9 +276,32 @@ public class MainMenu {
 
     // Seed some rooms
     private void seedRooms() {
-        rooms.add(new Room("101", RoomType.STANDARD, new BigDecimal("100"), 1));
-        rooms.add(new Room("102", RoomType.DELUXE, new BigDecimal("150"), 1));
-        rooms.add(new Room("201", RoomType.SUITE, new BigDecimal("250"), 2));
+        // Standard Rooms (20 rooms)
+        for (int i = 1; i <= 20; i++) {
+            String roomNumber = String.format("SD%03d", i);
+            rooms.add(new Room(roomNumber, RoomType.STANDARD, new BigDecimal("100"), 1));
+        }
+
+        // Deluxe Rooms (15 rooms)
+        for (int i = 1; i <= 15; i++) {
+            String roomNumber = String.format("DX%03d", i);
+            rooms.add(new Room(roomNumber, RoomType.DELUXE, new BigDecimal("150"), 2));
+        }
+
+        // Suite Rooms (10 rooms)
+        for (int i = 1; i <= 10; i++) {
+            String roomNumber = String.format("ST%03d", i);
+            rooms.add(new Room(roomNumber, RoomType.SUITE, new BigDecimal("250"), 3));
+        }
+
+        // Executive Rooms (5 rooms)
+        for (int i = 1; i <= 5; i++) {
+            String roomNumber = String.format("ET%03d", i);
+            rooms.add(new Room(roomNumber, RoomType.EXECUTIVE_SUITE, new BigDecimal("350"), 4));
+        }
+
+        // Presidential Room (1 room)
+        rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("500"), 5));
     }
 
     // Seed some menu items
