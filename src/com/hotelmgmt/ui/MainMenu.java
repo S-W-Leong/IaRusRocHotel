@@ -18,6 +18,7 @@ import com.hotelmgmt.services.RegisterRequirement;
 import com.hotelmgmt.services.ReservationService;
 import com.hotelmgmt.services.RoomService;
 import com.hotelmgmt.services.RoomServiceManager;
+import com.hotelmgmt.services.ViewProfile;
 import com.hotelmgmt.utils.ConsoleUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -283,9 +284,7 @@ public class MainMenu {
     }
 
     private void viewProfile() {
-        System.out.println("\n--- Profile ---");
-        System.out.println(currentUser);
-        ConsoleUtils.waitForEnter(scanner);
+        new ViewProfile(scanner).displayProfile(currentUser);
     }
 
     private void bookRoom() {
