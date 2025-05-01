@@ -8,6 +8,7 @@ import com.hotelmgmt.models.room.Room;
 import java.util.ArrayList;
 import java.util.List;
 
+// RoomServiceManager is a class that manages the room service orders in the hotel. It allows the user to place orders, update the status of an order, and get all orders for a guest or room.
 public class RoomServiceManager {
     private List<RoomServiceOrder> orders;
 

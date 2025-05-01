@@ -6,6 +6,7 @@ import com.hotelmgmt.models.user.Guest;
 import java.util.ArrayList;
 import java.util.List;
 
+// ReservationService is a class that manages the reservations in the hotel. It allows the user to create reservations, cancel reservations, and get reservations for a guest.
 public class ReservationService {
     private List<Reservation> reservations;
 

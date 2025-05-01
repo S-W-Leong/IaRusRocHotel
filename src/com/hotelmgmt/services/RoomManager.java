@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+// RoomManager is a class that manages the rooms in the hotel. It allows the user to view all rooms, add new rooms, and update the status of a room.
 public class RoomManager {
     private List<Room> rooms;
     private Scanner scanner;
