@@ -62,4 +62,8 @@ public class HousekeepingService {
     public void markRoomCleaned(Room room) {
         room.setNeedsCleaning(false);
     }
+
+    public boolean removeStaff(String employeeId) {
+        return housekeepingStaff.removeIf(staff -> staff.getEmployeeId().equals(employeeId));
+    }
 } 
