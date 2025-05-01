@@ -69,8 +69,8 @@ public class RoomManager {
 
     private void addNewRoom() {
         ConsoleUtils.clearScreen();
-        System.out.println("\n         Add New Room        ");
-        System.out.println("═════════════════════════════");
+        System.out.println("\n                             Add New Room        ");
+        System.out.println("                    ═════════════════════════════");
         displayRoomRequirements();
 
         System.out.print("Enter room number: ");
@@ -127,7 +127,8 @@ public class RoomManager {
 
     private void updateRoomStatus() {
         ConsoleUtils.clearScreen();
-        System.out.println("\n--- Update Room Status ---");
+        System.out.println("\n                             Update Room Status        ");
+        System.out.println("                       ═══════════════════════════════");
         
         System.out.print("Enter room number: ");
         String roomNumber = scanner.nextLine();
@@ -138,15 +139,28 @@ public class RoomManager {
             .orElse(null);
             
         if (room == null) {
-            System.out.println("Room not found!");
+            System.out.println("\nError: Room not found!");
             ConsoleUtils.waitForEnter(scanner);
             return;
         }
         
+        // Display only the searched room's information
+        System.out.println("\n╔═════════════════════════════════ Room Information ══════════════════════════════════════╗");
+        System.out.println("║  Room No.  │      Type      │         Status        │  Floor  │ Price (RM) │  Cleaning  ║");
+        System.out.println("╠════════════╪════════════════╪═══════════════════════╪═════════╪════════════╪════════════╣");
+        System.out.printf("║   %-8s │  %-12s  │   %-17s   │    %-3d  │   %-6.2f   │     %-3s    ║\n",
+            room.getRoomNumber(),
+            room.getType().toString().replace("_SUITE", ""),
+            room.getStatus(),
+            room.getFloor(),
+            room.getBasePrice(),
+            room.isNeedsCleaning() ? "YES" : "NO");
+        System.out.println("╚════════════╧════════════════╧═══════════════════════╧═════════╧════════════╧════════════╝");
+        
         System.out.println("\nCurrent Status: " + room.getStatus());
         System.out.println("\nAvailable Statuses:");
         for (RoomStatus status : RoomStatus.values()) {
-            System.out.println(status);
+            System.out.println("- " + status);
         }
         
         System.out.print("\nEnter new status: ");
@@ -154,9 +168,9 @@ public class RoomManager {
         
         try {
             room.setStatus(RoomStatus.valueOf(newStatus.toUpperCase()));
-            System.out.println("Room status updated successfully!");
+            System.out.println("\nRoom status updated successfully!");
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid status!");
+            System.out.println("\nError: Invalid status!");
         }
         
         ConsoleUtils.waitForEnter(scanner);
