@@ -116,8 +116,7 @@ public class RoomServiceMenu {
                     selectedItems.add(selectedItem);
                     System.out.println("\nAdded " + selectedItem.getName() + " to your order.");
                     
-                    System.out.print("\nWould you like to add another item from this category? (Y/N): ");
-                    if (!scanner.nextLine().trim().equalsIgnoreCase("Y")) {
+                    if (!validateAddMoreItems()) {
                         break;
                     }
                 } else {
@@ -140,6 +139,21 @@ public class RoomServiceMenu {
         }
     }
 
+    private boolean validateAddMoreItems() {
+        while (true) {
+            System.out.print("\nWould you like to add another item? (Y/N): ");
+            String response = scanner.nextLine().trim().toUpperCase();
+            
+            if (response.equals("Y") || response.equals("YES")) {
+                return true;
+            } else if (response.equals("N") || response.equals("NO")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter Y for Yes or N for No.");
+            }
+        }
+    }
+
     private void viewCurrentOrder(Guest guest, Room room) {
         ConsoleUtils.clearScreen();
         List<RoomServiceOrder> orders = roomServiceManager.getOrdersByGuest(guest);
@@ -151,20 +165,20 @@ public class RoomServiceMenu {
         }
 
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                     CURRENT ORDERS                              ║");
+        System.out.println("║                     CURRENT ORDERS                             ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
 
         for (RoomServiceOrder order : orders) {
-            System.out.println("║ Order ID: " + order.getId());
-            System.out.println("║ Items:");
+            System.out.println("║ Order ID: " + order.getId() + "                 ║");
+            System.out.println("║ Items:                                                         ║");
             for (MenuItem item : order.getItems()) {
-                System.out.printf("║  - %-54s ║\n", item.getName());
+                System.out.printf("║  - %-59s ║\n", item.getName());
                 System.out.printf("║    RM %.2f                                                    ║\n", item.getPrice());
             }
             if (order.getSpecialInstructions() != null && !order.getSpecialInstructions().isEmpty()) {
                 System.out.println("║ Special Instructions: " + order.getSpecialInstructions());
             }
-            System.out.printf("║ Total Amount: RM %.2f                                          ║\n", order.getTotalAmount());
+            System.out.printf("║ Total Amount: RM %.2f                                         ║\n", order.getTotalAmount());
             System.out.println("║                                                                ║");
         }
         
