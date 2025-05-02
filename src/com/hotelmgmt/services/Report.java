@@ -115,7 +115,7 @@ public class Report {
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         paymentsByMethod.forEach((method, amount) -> {
             double percentage = amount.doubleValue() / totalPaidAmount[0].doubleValue() * 100;
-            System.out.printf("║ %-15s: RM %-35.2f (%.1f%%) ║\n", method, amount, percentage);
+            System.out.printf("║ %-15s: RM %-31.2f (%.1f%%) ║\n", method, amount, percentage);
         });
         
         // Print Revenue Breakdown

@@ -116,8 +116,7 @@ public class RoomServiceMenu {
                     selectedItems.add(selectedItem);
                     System.out.println("\nAdded " + selectedItem.getName() + " to your order.");
                     
-                    System.out.print("\nWould you like to add another item from this category? (Y/N): ");
-                    if (!scanner.nextLine().trim().equalsIgnoreCase("Y")) {
+                    if (!validateAddMoreItems()) {
                         break;
                     }
                 } else {
@@ -137,6 +136,21 @@ public class RoomServiceMenu {
             RoomServiceOrder order = roomServiceManager.placeOrder(guest, room, selectedItems, specialInstructions);
             System.out.println("\nItems added to your order successfully!");
             ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
+    private boolean validateAddMoreItems() {
+        while (true) {
+            System.out.print("\nWould you like to add another item? (Y/N): ");
+            String response = scanner.nextLine().trim().toUpperCase();
+            
+            if (response.equals("Y") || response.equals("YES")) {
+                return true;
+            } else if (response.equals("N") || response.equals("NO")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter Y for Yes or N for No.");
+            }
         }
     }
 
