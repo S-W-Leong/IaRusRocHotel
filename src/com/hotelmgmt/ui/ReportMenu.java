@@ -1,9 +1,10 @@
-package com.hotelmgmt.services;
+package com.hotelmgmt.ui;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
+import com.hotelmgmt.services.Report;
 
 public class ReportMenu {
     private final Report reportAnalyse;

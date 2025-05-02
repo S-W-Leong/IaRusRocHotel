@@ -13,7 +13,6 @@ public class Invoice implements Serializable {
     private String id;
     private Reservation reservation;
     private List<RoomServiceOrder> roomServices;
-    private List<AdditionalCharge> additionalCharges;
     private BigDecimal roomCharges;
     private BigDecimal serviceCharges;
     private BigDecimal taxAmount;
@@ -28,7 +27,6 @@ public class Invoice implements Serializable {
         this.id = UUID.randomUUID().toString();
         this.reservation = reservation;
         this.roomServices = new ArrayList<>();
-        this.additionalCharges = new ArrayList<>();
         this.payments = new ArrayList<>();
         this.roomCharges = reservation.getTotalAmount();
         this.serviceCharges = BigDecimal.ZERO;
@@ -44,10 +42,7 @@ public class Invoice implements Serializable {
         calculateTotalAmount();
     }
 
-    public void addAdditionalCharge(AdditionalCharge charge) {
-        additionalCharges.add(charge);
-        calculateTotalAmount();
-    }
+ 
 
     public void addPayment(Payment payment) {
         payments.add(payment);
@@ -60,9 +55,6 @@ public class Invoice implements Serializable {
 
     private void calculateTotalAmount() {
         BigDecimal subtotal = roomCharges.add(serviceCharges);
-        for (AdditionalCharge charge : additionalCharges) {
-            subtotal = subtotal.add(charge.getAmount());
-        }
         // Calculate tax (assuming 10% tax rate)
         this.taxAmount = subtotal.multiply(new BigDecimal("0.10"));
         this.totalAmount = subtotal.add(taxAmount);
@@ -83,7 +75,6 @@ public class Invoice implements Serializable {
     public String getId() { return id; }
     public Reservation getReservation() { return reservation; }
     public List<RoomServiceOrder> getRoomServices() { return new ArrayList<>(roomServices); }
-    public List<AdditionalCharge> getAdditionalCharges() { return new ArrayList<>(additionalCharges); }
     public List<Payment> getPayments() { return new ArrayList<>(payments); }
     public BigDecimal getRoomCharges() { return roomCharges; }
     public BigDecimal getServiceCharges() { return serviceCharges; }

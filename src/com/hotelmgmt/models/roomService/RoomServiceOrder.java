@@ -4,28 +4,25 @@ import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.user.Guest;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 public class RoomServiceOrder implements Serializable {
     private String id;
     private Guest guest;
     private Room room;
     private List<MenuItem> items;
-    private RoomServiceStatus status;
     private String specialInstructions;
-    private LocalDateTime orderTime;
-    private LocalDateTime deliveryTime;
     private BigDecimal totalAmount;
+    private LocalDateTime orderTime;
 
     public RoomServiceOrder(Guest guest, Room room, List<MenuItem> items, String specialInstructions) {
         this.id = UUID.randomUUID().toString();
         this.guest = guest;
         this.room = room;
         this.items = new ArrayList<>(items);
-        this.status = RoomServiceStatus.PENDING;
         this.specialInstructions = specialInstructions;
         this.orderTime = LocalDateTime.now();
         calculateTotalAmount();
@@ -50,24 +47,16 @@ public class RoomServiceOrder implements Serializable {
         items.remove(item);
         calculateTotalAmount();
     }
-    public RoomServiceStatus getStatus() { return status; }
-    public void setStatus(RoomServiceStatus status) { 
-        this.status = status;
-        if (status == RoomServiceStatus.DELIVERED) {
-            this.deliveryTime = LocalDateTime.now();
-        }
-    }
     public String getSpecialInstructions() { return specialInstructions; }
     public void setSpecialInstructions(String specialInstructions) { 
         this.specialInstructions = specialInstructions; 
     }
-    public LocalDateTime getOrderTime() { return orderTime; }
-    public LocalDateTime getDeliveryTime() { return deliveryTime; }
     public BigDecimal getTotalAmount() { return totalAmount; }
+    public LocalDateTime getOrderTime() { return orderTime; }
 
     @Override
     public String toString() {
-        return String.format("RoomServiceOrder{id='%s', guest='%s', room='%s', items=%d, status=%s, amount=%s}",
-                id, guest.getUsername(), room.getRoomNumber(), items.size(), status, totalAmount);
+        return String.format("RoomServiceOrder{id='%s', guest='%s', room='%s', items=%d, amount=%s}",
+                id, guest.getUsername(), room.getRoomNumber(), items.size(), totalAmount);
     }
 } 

@@ -14,6 +14,7 @@ import com.hotelmgmt.models.billing.PaymentMethod;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import java.util.List;
 import java.math.BigDecimal;
+import com.hotelmgmt.models.billing.PaymentStatus;
 
 //
 public class BookingManager {
@@ -48,6 +49,10 @@ public class BookingManager {
     }
 
     public boolean cancelReservation(Reservation reservation) {
+        // Only allow cancellation if not checked in or checked out
+        if (reservation.getStatus() == ReservationStatus.CHECKED_IN || reservation.getStatus() == ReservationStatus.CHECKED_OUT) {
+            return false;
+        }
         boolean cancelled = reservationService.cancelReservation(reservation);
         if (cancelled) {
             roomService.updateRoomStatus(reservation.getRoom(), RoomStatus.AVAILABLE);
@@ -66,20 +71,25 @@ public class BookingManager {
 
     public boolean checkOut(Reservation reservation, PaymentMethod paymentMethod, String transactionReference, String notes) {
         if (reservation.getStatus() == ReservationStatus.CHECKED_IN) {
+            // Get the existing invoice
+            Invoice invoice = paymentService.getInvoiceById(reservation.getId());
+            
+            
+            if (invoice != null) {
+                System.out.println("Invoice ID: " + invoice.getId());
+                System.out.println("Reservation ID: " + reservation.getId());
+                System.out.println("Payment Status: " + invoice.getPaymentStatus());
+                System.out.println("Total Amount: " + invoice.getTotalAmount());
+                System.out.println("Paid Amount: " + invoice.getPaidAmount());
+            }
+
+            if (invoice == null || invoice.getPaymentStatus() != PaymentStatus.PAID) {
+                return false;
+            }
+
+            // If invoice is paid, proceed with check-out
             reservation.setStatus(ReservationStatus.CHECKED_OUT);
             roomService.updateRoomStatus(reservation.getRoom(), RoomStatus.AVAILABLE);
-            // Billing integration
-            Invoice invoice = paymentService.createInvoice(reservation);
-            // Add all room service orders for this room and guest to the invoice
-            List<RoomServiceOrder> orders = roomServiceManager.getOrdersForRoom(reservation.getRoom());
-            for (RoomServiceOrder order : orders) {
-                if (order.getGuest().equals(reservation.getGuest())) {
-                    invoice.addRoomService(order);
-                }
-            }
-            // Process payment (assume full payment at check-out)
-            BigDecimal total = invoice.getTotalAmount();
-            paymentService.processPayment(invoice, total, paymentMethod, transactionReference, notes);
             return true;
         }
         return false;
