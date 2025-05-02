@@ -7,6 +7,7 @@ import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.models.reservation.Reservation;
 import com.hotelmgmt.models.reservation.ReservationStatus;
 import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.room.RoomData;
 import com.hotelmgmt.models.room.RoomType;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
@@ -20,6 +21,7 @@ import com.hotelmgmt.services.BookingManager;
 import com.hotelmgmt.services.HousekeepingService;
 import com.hotelmgmt.services.PaymentService;
 import com.hotelmgmt.services.RegisterRequirement;
+import com.hotelmgmt.services.Report;
 import com.hotelmgmt.services.ReservationService;
 import com.hotelmgmt.services.RoomManager;
 import com.hotelmgmt.services.RoomService;
@@ -27,6 +29,7 @@ import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.ViewProfile;
 import com.hotelmgmt.utils.ConsoleUtils;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -158,6 +161,10 @@ public class MainMenu {
                 case "3":
                     new HousekeepingMenu(housekeepingService, roomManager).showMenu();
                     break;
+                case "4":
+                    Report report = new Report(reservations, rooms, roomServices, invoices);
+                    new ReportMenu(report).displayMenu();
+                    break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
                     ConsoleUtils.waitForEnter(scanner);
@@ -224,6 +231,8 @@ public class MainMenu {
             username = scanner.nextLine();
             if (!RegisterRequirement.isValidUsername(username)) {
                 System.out.println("Invalid username! Only letters, numbers, and underscore are allowed.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
             }
         } while (!RegisterRequirement.isValidUsername(username));
 
@@ -233,6 +242,8 @@ public class MainMenu {
             password = scanner.nextLine();
             if (!RegisterRequirement.isValidPassword(password)) {
                 System.out.println("Invalid password! Password must be at least 8 characters long and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
             }
         } while (!RegisterRequirement.isValidPassword(password));
 
@@ -247,6 +258,8 @@ public class MainMenu {
             email = scanner.nextLine();
             if (!RegisterRequirement.isValidEmail(email)) {
                 System.out.println("Invalid email format! Please enter a valid email address.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
             }
         } while (!RegisterRequirement.isValidEmail(email));
 
@@ -256,11 +269,54 @@ public class MainMenu {
             phone = scanner.nextLine();
             if (!RegisterRequirement.isValidPhone(phone)) {
                 System.out.println("Invalid phone number format! Please enter a valid phone number.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
             }
         } while (!RegisterRequirement.isValidPhone(phone));
 
+        String passportNumber;
+        do {
+            System.out.print("Enter passport number (digits only): ");
+            passportNumber = scanner.nextLine();
+            if (!RegisterRequirement.isValidPassportNumber(passportNumber)) {
+                System.out.println("Invalid passport number! Please enter digits only.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+        } while (!RegisterRequirement.isValidPassportNumber(passportNumber));
+
+        String dateOfBirth;
+        do {
+            System.out.print("Enter date of birth (YYYY-MM-DD): ");
+            dateOfBirth = scanner.nextLine();
+            if (!RegisterRequirement.isValidDateOfBirth(dateOfBirth)) {
+                System.out.println("Invalid date format! Please use YYYY-MM-DD format.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+        } while (!RegisterRequirement.isValidDateOfBirth(dateOfBirth));
+
+        String nationality;
+        do {
+            System.out.print("Enter nationality: ");
+            nationality = scanner.nextLine();
+            if (!RegisterRequirement.isValidNationality(nationality)) {
+                System.out.println("Invalid nationality! Please enter letters only.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+        } while (!RegisterRequirement.isValidNationality(nationality));
+
         try {
-            currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone);
+            // Format the date to ensure it has leading zeros
+            String[] dateParts = dateOfBirth.split("-");
+            String formattedDate = String.format("%s-%02d-%02d", 
+                dateParts[0], 
+                Integer.parseInt(dateParts[1]), 
+                Integer.parseInt(dateParts[2]));
+            
+            currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone, 
+                passportNumber, LocalDate.parse(formattedDate), nationality);
             System.out.println("\nRegistration successful!");
             ConsoleUtils.waitForEnter(scanner);
         } catch (Exception e) {

@@ -26,7 +26,19 @@ public class RegisterRequirement {
         System.out.println("║ • Must be in valid phone number format                                       ║");
         System.out.println("║ • Can include +, -, (), and spaces                                           ║");
         System.out.println("║ • Minimum 8 digits                                                           ║");
-        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝\n\n\n\n\n\n\n\n");
+        System.out.println("╠══════════════════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Passport Number:                                                             ║");
+        System.out.println("║ • Must contain only digits                                                   ║");
+        System.out.println("║ • Cannot be empty                                                            ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Date of Birth:                                                               ║");
+        System.out.println("║ • Must be in YYYY-MM-DD format                                               ║");
+        System.out.println("║ • Example: 1990-01-01                                                        ║");
+        System.out.println("╠══════════════════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Nationality:                                                                 ║");
+        System.out.println("║ • Must contain only letters and spaces                                       ║");
+        System.out.println("║ • Cannot be empty                                                            ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
     }
 
     public static boolean isValidUsername(String username) {
@@ -63,5 +75,29 @@ public class RegisterRequirement {
         // Allows various phone number formats including international numbers
         String phoneRegex = "^[+]?[0-9\\s-()]{8,}$";
         return phone.matches(phoneRegex);
+    }
+
+    public static boolean isValidPassportNumber(String passportNumber) {
+        if (passportNumber == null || passportNumber.isEmpty()) {
+            return false;
+        }
+        // Passport number should contain only digits
+        return passportNumber.matches("^\\d+$");
+    }
+
+    public static boolean isValidDateOfBirth(String dateOfBirth) {
+        if (dateOfBirth == null || dateOfBirth.isEmpty()) {
+            return false;
+        }
+        // Date format should be YYYY-MM-DD or YYYY-M-D
+        return dateOfBirth.matches("^\\d{4}-[1-9]\\d?-\\d{1,2}$");
+    }
+
+    public static boolean isValidNationality(String nationality) {
+        if (nationality == null || nationality.isEmpty()) {
+            return false;
+        }
+        // Nationality should contain only letters and spaces
+        return nationality.matches("^[a-zA-Z\\s]+$");
     }
 }

@@ -1,12 +1,13 @@
 package com.hotelmgmt.models.roomService;
 
+import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.user.Guest;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import com.hotelmgmt.models.user.Guest;
-import com.hotelmgmt.models.room.Room;
+import java.time.LocalDateTime;
 
 public class RoomServiceOrder implements Serializable {
     private String id;
@@ -15,6 +16,7 @@ public class RoomServiceOrder implements Serializable {
     private List<MenuItem> items;
     private String specialInstructions;
     private BigDecimal totalAmount;
+    private LocalDateTime orderTime;
 
     public RoomServiceOrder(Guest guest, Room room, List<MenuItem> items, String specialInstructions) {
         this.id = UUID.randomUUID().toString();
@@ -22,6 +24,7 @@ public class RoomServiceOrder implements Serializable {
         this.room = room;
         this.items = new ArrayList<>(items);
         this.specialInstructions = specialInstructions;
+        this.orderTime = LocalDateTime.now();
         calculateTotalAmount();
     }
 
@@ -49,6 +52,7 @@ public class RoomServiceOrder implements Serializable {
         this.specialInstructions = specialInstructions; 
     }
     public BigDecimal getTotalAmount() { return totalAmount; }
+    public LocalDateTime getOrderTime() { return orderTime; }
 
     @Override
     public String toString() {

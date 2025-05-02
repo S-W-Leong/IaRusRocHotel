@@ -52,13 +52,14 @@ public class AuthenticationService {
     }
 
     public Guest registerGuest(String username, String password, String firstName,
-                             String lastName, String email, String phone) throws Exception {
+                             String lastName, String email, String phone, String passportNumber,
+                             LocalDate dateOfBirth, String nationality) throws Exception {
         if (users.containsKey(username)) {
             throw new Exception("Username already exists");
         }
 
         Guest guest = new Guest(username, password, firstName, lastName, email, phone,
-            "TBD", LocalDate.now(), "TBD");
+            passportNumber, dateOfBirth, nationality);
         users.put(username, guest);
         
         return guest;

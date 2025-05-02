@@ -61,54 +61,10 @@ public class HousekeepingMenu {
     }
 
     private void assignTask() {
-        // Get valid task ID
-        String taskId;
-        while (true) {
-            System.out.print("Enter Task ID: ");
-            taskId = scanner.nextLine();
-            if (taskId != null && !taskId.trim().isEmpty()) {
-                break;
-            }
-            System.out.println("Task ID cannot be empty. Please try again.");
-        }
-
-        // Get room from RoomManager
-        System.out.print("Enter room number : ");
-        final String inputRoomNumber = scanner.nextLine().toUpperCase();
-        
-        // Format the room number if needed
-        final String formattedRoomNumber;
-        if (inputRoomNumber.length() == 3) {
-            // If user entered just the number (e.g., "101"), format it based on floor
-            int floor = Integer.parseInt(inputRoomNumber.substring(0, 1));
-            String prefix;
-            switch (floor) {
-                case 1: prefix = "SD"; break;
-                case 2: prefix = "DX"; break;
-                case 3: prefix = "ST"; break;
-                case 4: prefix = "ET"; break;
-                case 5: prefix = "PE"; break;
-                default: prefix = "";
-            }
-            formattedRoomNumber = prefix + inputRoomNumber;
-        } else {
-            formattedRoomNumber = inputRoomNumber;
-        }
-        
-        Room room = roomManager.getRooms().stream()
-            .filter(r -> r.getRoomNumber().equals(formattedRoomNumber))
-            .findFirst()
-            .orElse(null);
-            
-        if (room == null) {
-            System.out.println("Room not found. Please try again.");
-            return;
-        }
-
         // Get staff selection
         List<Staff> availableStaff = housekeepingService.getHousekeepingStaff();
         if (availableStaff.isEmpty()) {
-            System.out.println("No housekeeping staff available. Please add staff first.");
+            System.out.println("\nNo housekeeping staff available. Please add staff first.");
             return;
         }
 
@@ -134,6 +90,61 @@ public class HousekeepingMenu {
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
             }
+        }
+
+        // Get valid task ID
+        String taskId;
+        while (true) {
+            System.out.print("Enter Task ID: ");
+            taskId = scanner.nextLine();
+            if (taskId != null && !taskId.trim().isEmpty()) {
+                break;
+            }
+            System.out.println("Task ID cannot be empty. Please try again.");
+        }
+
+        // Get room from RoomManager
+        System.out.print("Enter room number : ");
+        final String inputRoomNumber = scanner.nextLine().toUpperCase();
+        
+        // Format the room number if needed
+        final String formattedRoomNumber;
+        if (inputRoomNumber.length() == 3) {
+            // If user entered just the number (e.g., "101"), format it based on floor
+            int floor = Integer.parseInt(inputRoomNumber.substring(0, 1));
+            String prefix;
+            switch (floor) {
+                case 1: 
+                    prefix = "SD"; 
+                    break;
+                case 2: 
+                    prefix = "DX";
+                    break;
+                case 3: 
+                    prefix = "ST"; 
+                    break;
+                case 4: 
+                    prefix = "ET"; 
+                    break;
+                case 5: 
+                    prefix = "PE"; 
+                    break;
+                default: 
+                    prefix = "";
+            }
+            formattedRoomNumber = prefix + inputRoomNumber;
+        } else {
+            formattedRoomNumber = inputRoomNumber;
+        }
+        
+        Room room = roomManager.getRooms().stream()
+            .filter(r -> r.getRoomNumber().equals(formattedRoomNumber))
+            .findFirst()
+            .orElse(null);
+            
+        if (room == null) {
+            System.out.println("Room not found. Please try again.");
+            return;
         }
 
         // Get valid scheduled time
@@ -271,8 +282,8 @@ public class HousekeepingMenu {
     private void listStaff() {
         List<Staff> staffList = housekeepingService.getHousekeepingStaff();
         for (Staff staff : staffList) {
-            System.out.println(
-                    "Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
+            System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName());
+            System.out.println("ID: " + staff.getEmployeeId());
         }
     }
 
