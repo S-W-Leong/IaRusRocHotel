@@ -238,8 +238,15 @@ public class MainMenu {
         } while (!RegisterRequirement.isValidNationality(nationality));
 
         try {
+            // Format the date to ensure it has leading zeros
+            String[] dateParts = dateOfBirth.split("-");
+            String formattedDate = String.format("%s-%02d-%02d", 
+                dateParts[0], 
+                Integer.parseInt(dateParts[1]), 
+                Integer.parseInt(dateParts[2]));
+            
             currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone, 
-                passportNumber, LocalDate.parse(dateOfBirth), nationality);
+                passportNumber, LocalDate.parse(formattedDate), nationality);
             System.out.println("\nRegistration successful!");
             ConsoleUtils.waitForEnter(scanner);
         } catch (Exception e) {

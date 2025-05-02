@@ -90,7 +90,7 @@ public class RegisterRequirement {
             return false;
         }
         // Date format should be YYYY-MM-DD or YYYY-M-D
-        return dateOfBirth.matches("^\\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\\d|3[01])$");
+        return dateOfBirth.matches("^\\d{4}-[1-9]\\d?-\\d{1,2}$");
     }
 
     public static boolean isValidNationality(String nationality) {
