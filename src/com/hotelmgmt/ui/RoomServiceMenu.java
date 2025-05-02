@@ -151,20 +151,20 @@ public class RoomServiceMenu {
         }
 
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                     CURRENT ORDERS                              ║");
+        System.out.println("║                     CURRENT ORDERS                             ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
 
         for (RoomServiceOrder order : orders) {
-            System.out.println("║ Order ID: " + order.getId());
-            System.out.println("║ Items:");
+            System.out.println("║ Order ID: " + order.getId() + "                 ║");
+            System.out.println("║ Items:                                                         ║");
             for (MenuItem item : order.getItems()) {
-                System.out.printf("║  - %-54s ║\n", item.getName());
+                System.out.printf("║  - %-59s ║\n", item.getName());
                 System.out.printf("║    RM %.2f                                                    ║\n", item.getPrice());
             }
             if (order.getSpecialInstructions() != null && !order.getSpecialInstructions().isEmpty()) {
                 System.out.println("║ Special Instructions: " + order.getSpecialInstructions());
             }
-            System.out.printf("║ Total Amount: RM %.2f                                          ║\n", order.getTotalAmount());
+            System.out.printf("║ Total Amount: RM %.2f                                         ║\n", order.getTotalAmount());
             System.out.println("║                                                                ║");
         }
         

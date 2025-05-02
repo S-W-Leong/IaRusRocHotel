@@ -333,12 +333,12 @@ public class ReservationsMenu {
                     if (order.getGuest().equals(reservation.getGuest())) {
                         if (!hasRoomService) {
                             System.out.println("║                                                                ║");
-                            System.out.println("║ Room Service Orders:                                          ║");
+                            System.out.println("║ Room Service Orders:                                           ║");
                             hasRoomService = true;
                         }
                         System.out.printf("║ - Order ID: %-50s ║\n", order.getId());
                         for (var item : order.getItems()) {
-                            System.out.printf("║   • %-55s ║\n", item.getName());
+                            System.out.printf("║   • %-58s ║\n", item.getName());
                         }
                     }
                 }
@@ -521,17 +521,17 @@ public class ReservationsMenu {
         
         List<RoomServiceOrder> orders = invoice.getRoomServices();
         if (orders.isEmpty()) {
-            System.out.println("║ No room service orders found.                                    ║");
+            System.out.println("║ No room service orders found.                                  ║");
         } else {
             for (RoomServiceOrder order : orders) {
                 System.out.printf("║ Order ID: %-52s ║\n", order.getId());
-                System.out.printf("║ Date: %-54s ║\n", order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.printf("║ Date: %-57s ║\n", order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
                 System.out.println("║ Items:                                                         ║");
                 for (var item : order.getItems()) {
-                    System.out.printf("║ • %-56s ║\n", item.getName());
-                    System.out.printf("║   RM %-54.2f ║\n", item.getPrice());
+                    System.out.printf("║ • %-60s ║\n", item.getName());
+                    System.out.printf("║   RM %-57.2f ║\n", item.getPrice());
                 }
-                System.out.printf("║ Order Total: RM %-44.2f ║\n", order.getTotalAmount());
+                System.out.printf("║ Order Total: RM %-46.2f ║\n", order.getTotalAmount());
                 System.out.println("║                                                                ║");
             }
         }
@@ -542,9 +542,9 @@ public class ReservationsMenu {
     private void displayCheckoutInvoice(Invoice invoice, Reservation reservation) {
         ConsoleUtils.clearScreen();
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                      CHECKOUT INVOICE                           ║");
+        System.out.println("║                      CHECKOUT INVOICE                          ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Room Charges: RM %-46.2f ║\n", reservation.getTotalAmount());
+        System.out.printf("║ Room Charges: RM %-45.2f ║\n", reservation.getTotalAmount());
         
         // Display room service orders
         BigDecimal roomServiceTotal = BigDecimal.ZERO;
@@ -552,15 +552,15 @@ public class ReservationsMenu {
         for (RoomServiceOrder order : invoice.getRoomServices()) {
             if (!hasRoomService) {
                 System.out.println("║                                                                ║");
-                System.out.println("║ Room Service Orders:                                          ║");
+                System.out.println("║ Room Service Orders:                                           ║");
                 hasRoomService = true;
             }
             BigDecimal orderTotal = order.getTotalAmount();
             roomServiceTotal = roomServiceTotal.add(orderTotal);
             System.out.printf("║ Order ID: %-52s ║\n", order.getId());
             for (var item : order.getItems()) {
-                System.out.printf("║ • %-56s ║\n", item.getName());
-                System.out.printf("║   RM %-54.2f ║\n", item.getPrice());
+                System.out.printf("║ • %-60s ║\n", item.getName());
+                System.out.printf("║   RM %-51.2f ║\n", item.getPrice());
             }
         }
         
