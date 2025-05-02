@@ -171,13 +171,13 @@ public class ReservationsMenu {
         while (!paid) {
             ConsoleUtils.clearScreen();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                         INVOICE                                 ║");
+            System.out.println("║                           INVOICE                              ║");
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.printf("║ Reservation ID: %-47s ║\n", reservation.getId());
-            System.out.printf("║ Room: %-15s Type: %-35s ║\n", 
+            System.out.printf("║ Reservation ID: %-46s ║\n", reservation.getId());
+            System.out.printf("║ Room: %-15s Type: %-34s ║\n", 
                 reservation.getRoom().getRoomNumber(), reservation.getRoom().getType());
-            System.out.printf("║ Check-in:  %-50s ║\n", reservation.getCheckInDate().toLocalDate());
-            System.out.printf("║ Check-out: %-50s ║\n", reservation.getCheckOutDate().toLocalDate());
+            System.out.printf("║ Check-in:  %-51s ║\n", reservation.getCheckInDate().toLocalDate());
+            System.out.printf("║ Check-out: %-51s ║\n", reservation.getCheckOutDate().toLocalDate());
             System.out.println("║                                                                ║");
             System.out.printf("║ Total Amount:  RM %-44.2f ║\n", invoice.getTotalAmount());
             System.out.printf("║ Amount Paid:   RM %-44.2f ║\n", invoice.getPaidAmount());
@@ -266,18 +266,18 @@ public class ReservationsMenu {
             // Print reservations
             for (int i = 0; i < myReservations.size(); i++) {
                 Reservation r = myReservations.get(i);
-                System.out.printf("║ %d. Room %-10s %-15s                              ║\n", 
+                System.out.printf("║ %d. Room %-10s %-15s                             ║\n", 
                     i + 1, r.getRoom().getRoomNumber(), r.getRoom().getType());
                 System.out.printf("║    Status: %-51s ║\n", r.getStatus());
-                System.out.printf("║    Check-in:  %-47s ║\n", r.getCheckInDate().toLocalDate());
-                System.out.printf("║    Check-out: %-47s ║\n", r.getCheckOutDate().toLocalDate());
+                System.out.printf("║    Check-in:  %-48s ║\n", r.getCheckInDate().toLocalDate());
+                System.out.printf("║    Check-out: %-48s ║\n", r.getCheckOutDate().toLocalDate());
                 System.out.printf("║    Amount: RM %-48.2f ║\n", r.getTotalAmount());
                 System.out.println("║                                                                ║");
             }
 
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.println("║ 1. Select a reservation                                         ║");
-            System.out.println("║ 0. Back                                                         ║");
+            System.out.println("║ 1. Select a reservation                                        ║");
+            System.out.println("║ 0. Back                                                        ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝");
 
             System.out.print("\nEnter your choice (0-1): ");

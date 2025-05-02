@@ -1,78 +1,113 @@
 package com.hotelmgmt.ui;
 
+import com.hotelmgmt.services.Report;
+import com.hotelmgmt.utils.ConsoleUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
-import com.hotelmgmt.services.Report;
 
 public class ReportMenu {
-    private final Report reportAnalyse;
     private final Scanner scanner;
+    private final Report report;
 
-    public ReportMenu(Report reportAnalyse) {
-        this.reportAnalyse = reportAnalyse;
+    public ReportMenu(Report report) {
         this.scanner = new Scanner(System.in);
+        this.report = report;
     }
 
     public void displayMenu() {
         while (true) {
-            System.out.println("\n=== Hotel Management System Reports ===");
-            System.out.println("1. Financial Report");
-            System.out.println("2. Room Popularity Report");
-            System.out.println("3. Comprehensive Report");
-            System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-
-            if (choice == 0) {
-                break;
-            }
-
-            LocalDate[] dates = getDateRange();
-            if (dates == null) {
-                continue;
-            }
+            ConsoleUtils.clearScreen();
+            System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                        REPORT MENU                            ║");
+            System.out.println("╠════════════════════════════════════════════════════════════════╣");
+            System.out.println("║ 1. Generate Financial Report                                  ║");
+            System.out.println("║ 2. Analyze Room Popularity                                    ║");
+            System.out.println("║ 3. Generate Comprehensive Report                              ║");
+            System.out.println("║ 0. Back to Main Menu                                          ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════╝");
+            
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
 
             switch (choice) {
-                case 1:
-                    reportAnalyse.generateFinancialReport(dates[0], dates[1]);
+                case "1":
+                    generateFinancialReport();
                     break;
-                case 2:
-                    reportAnalyse.analyzeRoomPopularity(dates[0], dates[1]);
+                case "2":
+                    analyzeRoomPopularity();
                     break;
-                case 3:
-                    reportAnalyse.generateComprehensiveReport(dates[0], dates[1]);
+                case "3":
+                    generateComprehensiveReport();
                     break;
+                case "0":
+                    return;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println("\nInvalid choice. Please try again.");
+                    ConsoleUtils.waitForEnter(scanner);
             }
         }
     }
 
+    private void generateFinancialReport() {
+        LocalDate[] dates = getDateRange();
+        if (dates != null) {
+            report.generateFinancialReport(dates[0], dates[1]);
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
+    private void analyzeRoomPopularity() {
+        LocalDate[] dates = getDateRange();
+        if (dates != null) {
+            report.analyzeRoomPopularity(dates[0], dates[1]);
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
+    private void generateComprehensiveReport() {
+        LocalDate[] dates = getDateRange();
+        if (dates != null) {
+            report.generateComprehensiveReport(dates[0], dates[1]);
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
     private LocalDate[] getDateRange() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    SELECT DATE RANGE                           ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
         
-        try {
-            System.out.print("Enter start date (YYYY-MM-DD): ");
-            String startDateStr = scanner.nextLine();
-            LocalDate startDate = LocalDate.parse(startDateStr, formatter);
+        LocalDate startDate = getDate("Enter start date (YYYY-MM-DD): ");
+        if (startDate == null) return null;
+        
+        LocalDate endDate = getDate("Enter end date (YYYY-MM-DD): ");
+        if (endDate == null) return null;
+        
+        if (endDate.isBefore(startDate)) {
+            System.out.println("\nEnd date cannot be before start date.");
+            ConsoleUtils.waitForEnter(scanner);
+            return null;
+        }
+        
+        return new LocalDate[]{startDate, endDate};
+    }
 
-            System.out.print("Enter end date (YYYY-MM-DD): ");
-            String endDateStr = scanner.nextLine();
-            LocalDate endDate = LocalDate.parse(endDateStr, formatter);
-
-            if (endDate.isBefore(startDate)) {
-                System.out.println("End date cannot be before start date.");
+    private LocalDate getDate(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String dateStr = scanner.nextLine();
+            
+            if (dateStr.equalsIgnoreCase("exit")) {
                 return null;
             }
-
-            return new LocalDate[]{startDate, endDate};
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format. Please use YYYY-MM-DD format.");
-            return null;
+            
+            try {
+                return LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD format.");
+            }
         }
     }
 } 
