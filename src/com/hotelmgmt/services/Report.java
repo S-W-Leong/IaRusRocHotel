@@ -6,6 +6,8 @@ import com.hotelmgmt.models.billing.PaymentMethod;
 import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.models.reservation.Reservation;
 import com.hotelmgmt.models.room.Room;
+import com.hotelmgmt.models.roomService.MenuCategory;
+import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,8 +38,8 @@ public class Report {
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
         System.out.println("║                      FINANCIAL REPORT                          ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Period: %-50s ║\n", startDate + " to " + endDate);
-        System.out.printf("║ Generated on: %-45s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        System.out.printf("║ Period: %-54s ║\n", startDate + " to " + endDate);
+        System.out.printf("║ Generated on: %-48s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         
         // Get all invoices from PaymentService
@@ -98,10 +100,10 @@ public class Report {
         System.out.println("║                                                                ║");
         System.out.println("║ Payment Summary:                                               ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Total Paid Amount: RM %-42.2f ║\n", totalPaidAmount[0]);
+        System.out.printf("║ Total Paid Amount: RM %-41.2f║\n", totalPaidAmount[0]);
         System.out.printf("║ Number of Paid Invoices: %-37d ║\n", paidCount[0]);
-        System.out.printf("║ Total Pending Amount: RM %-41.2f ║\n", totalPendingAmount[0]);
-        System.out.printf("║ Number of Pending Invoices: %-36d ║\n", pendingCount[0]);
+        System.out.printf("║ Total Pending Amount: RM %-37.2f ║\n", totalPendingAmount[0]);
+        System.out.printf("║ Number of Pending Invoices: %-34d ║\n", pendingCount[0]);
         if (paidCount[0] > 0) {
             System.out.printf("║ Average Payment Amount: RM %-39.2f ║\n", 
                 totalPaidAmount[0].divide(BigDecimal.valueOf(paidCount[0]), 2, BigDecimal.ROUND_HALF_UP));
@@ -113,16 +115,16 @@ public class Report {
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         paymentsByMethod.forEach((method, amount) -> {
             double percentage = amount.doubleValue() / totalPaidAmount[0].doubleValue() * 100;
-            System.out.printf("║ %-15s: RM %-39.2f (%.1f%%) ║\n", method, amount, percentage);
+            System.out.printf("║ %-15s: RM %-35.2f (%.1f%%) ║\n", method, amount, percentage);
         });
         
         // Print Revenue Breakdown
         System.out.println("║                                                                ║");
-        System.out.println("║ Revenue Breakdown:                                            ║");
+        System.out.println("║ Revenue Breakdown:                                             ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Room Revenue: RM %-44.2f ║\n", roomRevenue);
-        System.out.printf("║ Room Service Revenue: RM %-38.2f ║\n", roomServiceRevenue);
-        System.out.printf("║ Total Revenue: RM %-44.2f ║\n", totalRevenue);
+        System.out.printf("║ Room Revenue: RM %-45.2f ║\n", roomRevenue);
+        System.out.printf("║ Room Service Revenue: RM %-37.2f ║\n", roomServiceRevenue);
+        System.out.printf("║ Total Revenue: RM %-45.2f║\n", totalRevenue);
         
         // Revenue by Room Type - Only include completed reservations
         System.out.println("║                                                                ║");
@@ -142,7 +144,7 @@ public class Report {
             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
             .forEach(entry -> {
                 double percentage = entry.getValue().doubleValue() / totalRevenue.doubleValue() * 100;
-                System.out.printf("║ %-20s: RM %-36.2f (%.1f%%) ║\n", 
+                System.out.printf("║ %-20s: RM %-31.2f (%.1f%%) ║\n", 
                     entry.getKey(), entry.getValue(), percentage);
             });
         
@@ -154,8 +156,8 @@ public class Report {
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
         System.out.println("║                    ROOM POPULARITY ANALYSIS                    ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
-        System.out.printf("║ Period: %-50s ║\n", startDate + " to " + endDate);
-        System.out.printf("║ Generated on: %-45s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        System.out.printf("║ Period: %-54s ║\n", startDate + " to " + endDate);
+        System.out.printf("║ Generated on: %-48s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         
         // Count bookings by room type - Only include completed reservations
@@ -175,13 +177,13 @@ public class Report {
         
         // Print room type popularity
         System.out.println("║                                                                ║");
-        System.out.println("║ Room Type Popularity:                                         ║");
+        System.out.println("║ Room Type Popularity:                                          ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         bookingsByRoomType.entrySet().stream()
             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
             .forEach(entry -> {
                 double percentage = (double) entry.getValue() / totalBookings * 100;
-                System.out.printf("║ %-20s: %-37d bookings (%.1f%%) ║\n", 
+                System.out.printf("║ %-20s: %-21d bookings (%.1f%%) ║\n", 
                     entry.getKey(), entry.getValue(), percentage);
             });
         
@@ -192,7 +194,7 @@ public class Report {
             .orElse("No bookings");
         
         System.out.println("║                                                                ║");
-        System.out.printf("║ Most Popular Room Type: %-40s ║\n", mostPopularRoomType);
+        System.out.printf("║ Most Popular Room Type: %-38s ║\n", mostPopularRoomType);
         System.out.println("╚════════════════════════════════════════════════════════════════╝");
     }
 
@@ -207,6 +209,88 @@ public class Report {
         
         generateFinancialReport(startDate, endDate);
         analyzeRoomPopularity(startDate, endDate);
+    }
+
+    // Room Service Revenue Report
+    public void generateRoomServiceRevenueReport(LocalDate startDate, LocalDate endDate) {
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println(  "║                  ROOM SERVICE REVENUE REPORT                   ║");
+        System.out.println(  "╠════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Period: %-54s ║\n", startDate + " to " + endDate);
+        System.out.printf("║ Generated on: %-48s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+
+        // Get all invoices from PaymentService
+        List<Invoice> allInvoices = paymentService.getAllInvoices();
+
+        // Calculate total room service revenue
+        BigDecimal totalRoomServiceRevenue = roomServiceOrders.stream()
+            .filter(o -> allInvoices.stream()
+                .filter(invoice -> invoice.getPaymentStatus() == PaymentStatus.PAID)
+                .anyMatch(invoice -> invoice.getRoomServices().contains(o)))
+            .filter(o -> !o.getOrderTime().toLocalDate().isBefore(startDate) && 
+                        !o.getOrderTime().toLocalDate().isAfter(endDate))
+            .map(RoomServiceOrder::getTotalAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Revenue by category
+        Map<MenuCategory, BigDecimal> revenueByCategory = roomServiceOrders.stream()
+            .filter(o -> allInvoices.stream()
+                .filter(invoice -> invoice.getPaymentStatus() == PaymentStatus.PAID)
+                .anyMatch(invoice -> invoice.getRoomServices().contains(o)))
+            .filter(o -> !o.getOrderTime().toLocalDate().isBefore(startDate) && 
+                        !o.getOrderTime().toLocalDate().isAfter(endDate))
+            .flatMap(order -> order.getItems().stream())
+            .collect(Collectors.groupingBy(
+                MenuItem::getCategory,
+                Collectors.mapping(MenuItem::getPrice, 
+                    Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+            ));
+
+        // Most popular items
+        Map<String, Long> itemPopularity = roomServiceOrders.stream()
+            .filter(o -> allInvoices.stream()
+                .filter(invoice -> invoice.getPaymentStatus() == PaymentStatus.PAID)
+                .anyMatch(invoice -> invoice.getRoomServices().contains(o)))
+            .filter(o -> !o.getOrderTime().toLocalDate().isBefore(startDate) && 
+                        !o.getOrderTime().toLocalDate().isAfter(endDate))
+            .flatMap(order -> order.getItems().stream())
+            .collect(Collectors.groupingBy(
+                MenuItem::getName,
+                Collectors.counting()
+            ));
+
+        // Print total revenue
+        System.out.println("║                                                                ║");
+        System.out.println("║ Total Room Service Revenue:                                    ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.printf("║ Total Revenue: RM %-44.2f ║\n", totalRoomServiceRevenue);
+
+        // Print revenue by category
+        System.out.println("║                                                                ║");
+        System.out.println("║ Revenue by Category:                                           ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        revenueByCategory.entrySet().stream()
+            .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+            .forEach(entry -> {
+                double percentage = entry.getValue().doubleValue() / totalRoomServiceRevenue.doubleValue() * 100;
+                System.out.printf("║ %-20s: RM %-31.2f (%.1f%%) ║\n", 
+                    entry.getKey(), entry.getValue(), percentage);
+            });
+
+        // Print most popular items
+        System.out.println("║                                                                ║");
+        System.out.println("║ Most Popular Items:                                            ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        itemPopularity.entrySet().stream()
+            .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+            .limit(5)
+            .forEach(entry -> {
+                System.out.printf("║ %-20s: %-30d orders ║\n", 
+                    entry.getKey(), entry.getValue());
+            });
+
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
     }
 
     private boolean isWithinDateRange(LocalDateTime date, LocalDate startDate, LocalDate endDate) {

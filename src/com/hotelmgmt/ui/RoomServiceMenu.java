@@ -1,10 +1,10 @@
 package com.hotelmgmt.ui;
 
+import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import com.hotelmgmt.models.user.Guest;
-import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.utils.ConsoleUtils;
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ public class RoomServiceMenu {
         while (true) {
             ConsoleUtils.clearScreen();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                     ROOM SERVICE MENU                           ║");
+            System.out.println("║                     ROOM SERVICE MENU                          ║");
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.println("║ Please select a category:                                       ║");
+            System.out.println("║ Please select a category:                                      ║");
             System.out.println("║                                                                ║");
             System.out.println("║ 1. Breakfast                                                   ║");
             System.out.println("║ 2. Lunch                                                       ║");
@@ -38,7 +38,7 @@ public class RoomServiceMenu {
             System.out.println("║ 6. Desserts                                                    ║");
             System.out.println("║ 7. View Current Order                                          ║");
             System.out.println("║ 8. Complete Order                                              ║");
-            System.out.println("║ 9. Back to Main Menu                                          ║");
+            System.out.println("║ 9. Back to Main Menu                                           ║");
             System.out.println("║                                                                ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝");
             
@@ -93,8 +93,8 @@ public class RoomServiceMenu {
             
             for (int i = 0; i < categoryItems.size(); i++) {
                 MenuItem item = categoryItems.get(i);
-                System.out.printf("║ %d. %-54s ║\n", (i + 1), item.getName());
-                System.out.printf("║    %-54s ║\n", item.getDescription());
+                System.out.printf("║ %d. %-59s ║\n", (i + 1), item.getName());
+                System.out.printf("║    %-59s ║\n", item.getDescription());
                 System.out.printf("║    RM %.2f                                                    ║\n", item.getPrice());
                 System.out.println("║                                                                ║");
             }

@@ -123,7 +123,7 @@ public class RoomManager {
 
     public static void displayRoomRequirements() {
         System.out.println("\n════════════════════════════════════════════════════════════════════════════════");
-        System.out.println("                           ROOM NUMBER FORMAT                              ");
+        System.out.println("                                   ROOM FORMAT                                  ");
         System.out.println("════════════════════════════════════════════════════════════════════════════════");
         System.out.println("╔══════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║ Room Number Format:                                                          ║");

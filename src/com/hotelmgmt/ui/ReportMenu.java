@@ -20,12 +20,13 @@ public class ReportMenu {
         while (true) {
             ConsoleUtils.clearScreen();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                        REPORT MENU                            ║");
+            System.out.println("║                        REPORT MENU                             ║");
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.println("║ 1. Generate Financial Report                                  ║");
-            System.out.println("║ 2. Analyze Room Popularity                                    ║");
-            System.out.println("║ 3. Generate Comprehensive Report                              ║");
-            System.out.println("║ 0. Back to Main Menu                                          ║");
+            System.out.println("║ 1. Generate Financial Report                                   ║");
+            System.out.println("║ 2. Analyze Room Popularity                                     ║");
+            System.out.println("║ 3. Generate Comprehensive Report                               ║");
+            System.out.println("║ 4. Generate Room Service Revenue Report                        ║");
+            System.out.println("║ 0. Back to Main Menu                                           ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝");
             
             System.out.print("\nEnter your choice: ");
@@ -40,6 +41,9 @@ public class ReportMenu {
                     break;
                 case "3":
                     generateComprehensiveReport();
+                    break;
+                case "4":
+                    generateRoomServiceRevenueReport();
                     break;
                 case "0":
                     return;
@@ -74,23 +78,37 @@ public class ReportMenu {
         }
     }
 
+    private void generateRoomServiceRevenueReport() {
+        LocalDate[] dates = getDateRange();
+        if (dates != null) {
+            report.generateRoomServiceRevenueReport(dates[0], dates[1]);
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
     private LocalDate[] getDateRange() {
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
         System.out.println("║                    SELECT DATE RANGE                           ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.println("║ Enter dates in YYYY-MM-DD format (e.g., 2024-05-01)            ║");
+        System.out.println("║ Type 'exit' to return to the previous menu                     ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
         
-        LocalDate startDate = getDate("Enter start date (YYYY-MM-DD): ");
+        LocalDate startDate = getDate("║ Start Date: ");
         if (startDate == null) return null;
         
-        LocalDate endDate = getDate("Enter end date (YYYY-MM-DD): ");
+        LocalDate endDate = getDate("║ End Date: ");
         if (endDate == null) return null;
         
         if (endDate.isBefore(startDate)) {
-            System.out.println("\nEnd date cannot be before start date.");
+            System.out.println("╠═════════════════════════════════════════════════════════════════╣");
+            System.out.println("║ Error: End date cannot be before start date                     ║");
+            System.out.println("╚═════════════════════════════════════════════════════════════════╝");
             ConsoleUtils.waitForEnter(scanner);
             return null;
         }
         
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
         return new LocalDate[]{startDate, endDate};
     }
 
@@ -104,9 +122,13 @@ public class ReportMenu {
             }
             
             try {
-                return LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                return date;
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please use YYYY-MM-DD format.");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
+                System.out.println("║ Error: Invalid date format. Please use YYYY-MM-DD format      ║");
+                System.out.println("╠════════════════════════════════════════════════════════════════╣");
             }
         }
     }
