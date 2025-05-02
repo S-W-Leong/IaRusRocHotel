@@ -126,7 +126,7 @@ public class Report {
         
         // Revenue by Room Type - Only include completed reservations
         System.out.println("║                                                                ║");
-        System.out.println("║ Revenue by Room Type:                                         ║");
+        System.out.println("║ Revenue by Room Type:                                          ║");
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         Map<String, BigDecimal> revenueByRoomType = reservations.stream()
             .filter(r -> r.getStatus().equals(com.hotelmgmt.models.reservation.ReservationStatus.CHECKED_OUT))
