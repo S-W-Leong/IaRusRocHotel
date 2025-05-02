@@ -284,20 +284,36 @@
 
         private void listStaff() {
             List<Staff> staffList = housekeepingService.getHousekeepingStaff();
-            for (Staff staff : staffList) {
-                System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName());
-                System.out.println("ID: " + staff.getEmployeeId());
+            if (staffList.isEmpty()) {
+                System.out.println("No housekeeping staff members found.");
+            } else {
+                for (Staff staff : staffList) {
+                    System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName());
+                    System.out.println("Username: " + staff.getUsername());
+                    System.out.println("ID: " + staff.getEmployeeId());
+                }
             }
         }
 
-        private void removeStaff() {
-            System.out.print("Enter employee ID of staff to remove: ");
-            String employeeId = scanner.nextLine();
+       private void removeStaff() {
+            System.out.print("Enter staff username to remove: ");
+            String username = scanner.nextLine();
 
-            if (housekeepingService.removeStaff(employeeId)) {
-                System.out.println("Staff member successfully removed.");
-            } else {
-                System.out.println("Staff member not found or could not be removed.");
+            List<Staff> staffList = housekeepingService.getHousekeepingStaff();
+            boolean removed = false;
+
+            for (Staff staff : staffList) {
+                if (staff.getUsername().equals(username)) {
+                    staffList.remove(staff);
+                    System.out.println("Staff member successfully removed.");
+                    removed = true;
+                    break;
+                }
+            }
+
+            if (!removed) {
+                System.out.println("Staff member not found. Please check the username and try again.");
+                System.out.println("Note: Usernames are case-sensitive.");
             }
         }
     }
