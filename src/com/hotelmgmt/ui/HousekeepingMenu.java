@@ -61,6 +61,37 @@ public class HousekeepingMenu {
     }
 
     private void assignTask() {
+        // Get staff selection
+        List<Staff> availableStaff = housekeepingService.getHousekeepingStaff();
+        if (availableStaff.isEmpty()) {
+            System.out.println("\nNo housekeeping staff available. Please add staff first.");
+            return;
+        }
+
+        System.out.println("\nAvailable Housekeeping Staff:");
+        for (int i = 0; i < availableStaff.size(); i++) {
+            Staff s = availableStaff.get(i);
+            System.out.printf("%d. %s (ID: %s)\n",
+                    i + 1,
+                    s.getFirstName(),
+                    s.getEmployeeId());
+        }
+
+        Staff selectedStaff = null;
+        while (selectedStaff == null) {
+            System.out.print("\nSelect staff member (1-" + availableStaff.size() + "): ");
+            try {
+                int selection = Integer.parseInt(scanner.nextLine());
+                if (selection > 0 && selection <= availableStaff.size()) {
+                    selectedStaff = availableStaff.get(selection - 1);
+                } else {
+                    System.out.println("Invalid selection. Please try again.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+
         // Get valid task ID
         String taskId;
         while (true) {
@@ -114,37 +145,6 @@ public class HousekeepingMenu {
         if (room == null) {
             System.out.println("Room not found. Please try again.");
             return;
-        }
-
-        // Get staff selection
-        List<Staff> availableStaff = housekeepingService.getHousekeepingStaff();
-        if (availableStaff.isEmpty()) {
-            System.out.println("No housekeeping staff available. Please add staff first.");
-            return;
-        }
-
-        System.out.println("\nAvailable Housekeeping Staff:");
-        for (int i = 0; i < availableStaff.size(); i++) {
-            Staff s = availableStaff.get(i);
-            System.out.printf("%d. %s (ID: %s)\n",
-                    i + 1,
-                    s.getFirstName(),
-                    s.getEmployeeId());
-        }
-
-        Staff selectedStaff = null;
-        while (selectedStaff == null) {
-            System.out.print("\nSelect staff member (1-" + availableStaff.size() + "): ");
-            try {
-                int selection = Integer.parseInt(scanner.nextLine());
-                if (selection > 0 && selection <= availableStaff.size()) {
-                    selectedStaff = availableStaff.get(selection - 1);
-                } else {
-                    System.out.println("Invalid selection. Please try again.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number.");
-            }
         }
 
         // Get valid scheduled time
@@ -282,8 +282,8 @@ public class HousekeepingMenu {
     private void listStaff() {
         List<Staff> staffList = housekeepingService.getHousekeepingStaff();
         for (Staff staff : staffList) {
-            System.out.println(
-                    "Staff: " + staff.getFirstName() + " " + staff.getLastName() + ", ID: " + staff.getEmployeeId());
+            System.out.println("Staff: " + staff.getFirstName() + " " + staff.getLastName());
+            System.out.println("ID: " + staff.getEmployeeId());
         }
     }
 
