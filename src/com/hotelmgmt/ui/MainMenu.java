@@ -1,15 +1,9 @@
 package com.hotelmgmt.ui;
 
 import com.hotelmgmt.models.billing.Invoice;
-import com.hotelmgmt.models.billing.Payment;
-import com.hotelmgmt.models.billing.PaymentMethod;
-import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.models.reservation.Reservation;
-import com.hotelmgmt.models.reservation.ReservationStatus;
 import com.hotelmgmt.models.room.Room;
-import com.hotelmgmt.models.room.RoomData;
 import com.hotelmgmt.models.room.RoomType;
-import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import com.hotelmgmt.models.user.Guest;
@@ -64,6 +58,25 @@ public class MainMenu {
         this.housekeepingService = new HousekeepingService();
         this.roomManager = new RoomManager(rooms);
         this.reservationsMenu = new ReservationsMenu(scanner, bookingManager, reservationService, paymentService, roomService, roomServiceManager);
+        
+        // Initialize lists with existing data
+        updateLists();
+    }
+
+    private void updateLists() {
+        // Update reservations list
+        reservations.clear();
+        reservations.addAll(reservationService.getAllReservations());
+        
+        // Update room services list
+        roomServices.clear();
+        for (Room room : rooms) {
+            roomServices.addAll(roomServiceManager.getOrdersForRoom(room));
+        }
+        
+        // Update invoices list
+        invoices.clear();
+        invoices.addAll(paymentService.getAllInvoices());
     }
 
     public void start() {
@@ -142,6 +155,7 @@ public class MainMenu {
                     break;
                 case "2":
                     reservationsMenu.displayMenu((Guest) currentUser);
+                    updateLists(); // Update lists after guest actions
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
@@ -162,6 +176,7 @@ public class MainMenu {
                     new HousekeepingMenu(housekeepingService, roomManager).showMenu();
                     break;
                 case "4":
+                    updateLists(); // Update lists before generating report
                     Report report = new Report(reservations, rooms, roomServices, invoices);
                     new ReportMenu(report).displayMenu();
                     break;
@@ -354,6 +369,4 @@ public class MainMenu {
         // Presidential Room (1 room)
         rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("800"), 5));
     }
-
-    
 }
