@@ -18,35 +18,7 @@ public class RoomManager {
         this.scanner = new Scanner(System.in);
     }
 
-    public void manageRooms() {
-        ConsoleUtils.clearScreen();
-        System.out.println("\n═════ Room Management ═════");
-        System.out.println("1. View All Rooms");
-        System.out.println("2. Add New Room");
-        System.out.println("3. Update Room Status");
-        System.out.println("4. Back to Main Menu");
-        System.out.print("\nEnter your choice: ");
-
-        String choice = scanner.nextLine();
-        switch (choice) {
-            case "1":
-                viewAllRooms();
-                break;
-            case "2":
-                addNewRoom();
-                break;
-            case "3":
-                updateRoomStatus();
-                break;
-            case "4":
-                return;
-            default:
-                System.out.println("Invalid choice. Please try again.");
-                ConsoleUtils.waitForEnter(scanner);
-        }
-    }
-
-    private void viewAllRooms() {
+    public void viewAllRooms() {
         ConsoleUtils.clearScreen();
         System.out.println("\n╔════════════════════════════════════ Room List ══════════════════════════════════════════╗");
         System.out.println("║  Room No.  │      Type      │         Status        │  Floor  │ Price (RM) │  Cleaning  ║");
@@ -67,7 +39,7 @@ public class RoomManager {
         ConsoleUtils.waitForEnter(scanner);
     }
 
-    private void addNewRoom() {
+    public void addNewRoom() {
         ConsoleUtils.clearScreen();
         System.out.println("\n                             Add New Room        ");
         System.out.println("                    ═════════════════════════════");
@@ -171,7 +143,7 @@ public class RoomManager {
         System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
     }
 
-    private void updateRoomStatus() {
+    public void updateRoomStatus() {
         ConsoleUtils.clearScreen();
         System.out.println("\n                             Update Room Status        ");
         System.out.println("                       ═══════════════════════════════");

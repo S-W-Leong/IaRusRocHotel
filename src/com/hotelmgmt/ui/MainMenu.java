@@ -1,15 +1,10 @@
 package com.hotelmgmt.ui;
 
 import com.hotelmgmt.models.billing.Invoice;
-import com.hotelmgmt.models.billing.Payment;
-import com.hotelmgmt.models.billing.PaymentMethod;
-import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.models.reservation.Reservation;
-import com.hotelmgmt.models.reservation.ReservationStatus;
 import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.room.RoomData;
 import com.hotelmgmt.models.room.RoomType;
-import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import com.hotelmgmt.models.user.Guest;
@@ -38,7 +33,7 @@ public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
     private User currentUser;
-    private final List<Room> rooms = new ArrayList<>();
+    private List<Room> rooms;
     private final List<Reservation> reservations = new ArrayList<>();
     private final List<RoomServiceOrder> roomServices = new ArrayList<>();
     private final List<MenuItem> menuItems = new ArrayList<>();
@@ -55,7 +50,7 @@ public class MainMenu {
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
         this.authService = new AuthenticationService();
-        seedRooms();
+        this.rooms = RoomData.getRooms();
         this.roomService = new RoomService(rooms);
         this.reservationService = new ReservationService();
         this.roomServiceManager = new RoomServiceManager(rooms);
@@ -64,6 +59,25 @@ public class MainMenu {
         this.housekeepingService = new HousekeepingService();
         this.roomManager = new RoomManager(rooms);
         this.reservationsMenu = new ReservationsMenu(scanner, bookingManager, reservationService, paymentService, roomService, roomServiceManager);
+        
+        // Initialize lists with existing data
+        updateLists();
+    }
+
+    private void updateLists() {
+        // Update reservations list
+        reservations.clear();
+        reservations.addAll(reservationService.getAllReservations());
+        
+        // Update room services list
+        roomServices.clear();
+        for (Room room : rooms) {
+            roomServices.addAll(roomServiceManager.getOrdersForRoom(room));
+        }
+        
+        // Update invoices list
+        invoices.clear();
+        invoices.addAll(paymentService.getAllInvoices());
     }
 
     public void start() {
@@ -77,28 +91,28 @@ public class MainMenu {
     }
 
     private void showLoginMenu() {
-        ConsoleUtils.clearScreen();
-        Logo.display();
+            ConsoleUtils.clearScreen();
+            Logo.display();
         System.out.println("\n1. Login");
         System.out.println("2. Register");
         System.out.println("0. Exit");
-        System.out.print("\nEnter your choice: ");
-        String choice = scanner.nextLine();
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
 
-        switch (choice) {
-            case "1":
-                login();
-                break;
-            case "2":
-                register();
-                break;
+            switch (choice) {
+                case "1":
+                    login();
+                    break;
+                case "2":
+                    register();
+                    break;
             case "0":
                 System.out.println("\nThank you for using our system!");
-                System.exit(0);
-                break;
-            default:
+                    System.exit(0);
+                    break;
+                default:
                 System.out.println("\nInvalid choice. Please try again.");
-                ConsoleUtils.waitForEnter(scanner);
+                    ConsoleUtils.waitForEnter(scanner);
         }
     }
 
@@ -107,21 +121,21 @@ public class MainMenu {
             ConsoleUtils.clearScreen();
             Logo.display();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.printf("║ Welcome, %-52s ║\n", currentUser.getFullName());
+            System.out.printf("║ Welcome, %-53s ║\n", currentUser.getFullName());
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
             System.out.println("║ 1. View Profile                                                ║");
             
             if (currentUser.getRole() == UserRole.GUEST) {
-                System.out.println("║ 2. Room Booking & Reservations                                ║");
+                System.out.println("║ 2. Room Booking & Reservations                                 ║");
             } else if (currentUser.getRole() == UserRole.MANAGER) {
-                System.out.println("║ 2. Room Management                                           ║");
-                System.out.println("║ 3. Housekeeping Management                                   ║");
-                System.out.println("║ 4. Reports                                                   ║");
+                System.out.println("║ 2. Room Management                                             ║");
+                System.out.println("║ 3. Housekeeping Management                                     ║");
+                System.out.println("║ 4. Reports                                                     ║");
             } else {
-                System.out.println("║ 2. View Tasks                                                ║");
-                System.out.println("║ 3. View Room Status                                          ║");
+                System.out.println("║ 2. View Tasks                                                  ║");
+                System.out.println("║ 3. View Room Status                                            ║");
             }
-            
+
             System.out.println("║ 0. Logout                                                      ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝");
             
@@ -142,6 +156,7 @@ public class MainMenu {
                     break;
                 case "2":
                     reservationsMenu.displayMenu((Guest) currentUser);
+                    updateLists(); // Update lists after guest actions
                     break;
                 default:
                     System.out.println("\nInvalid choice. Please try again.");
@@ -156,12 +171,13 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                    roomManager.manageRooms();
+                    new RoomManageMenu(scanner, roomManager).showMenu();
                     break;
                 case "3":
                     new HousekeepingMenu(housekeepingService, roomManager).showMenu();
                     break;
                 case "4":
+                    updateLists(); // Update lists before generating report
                     Report report = new Report(reservations, rooms, roomServices, invoices);
                     new ReportMenu(report).displayMenu();
                     break;
@@ -290,7 +306,7 @@ public class MainMenu {
             System.out.print("Enter date of birth (YYYY-MM-DD): ");
             dateOfBirth = scanner.nextLine();
             if (!RegisterRequirement.isValidDateOfBirth(dateOfBirth)) {
-                System.out.println("Invalid date format! Please use YYYY-MM-DD format.");
+                System.out.println("Invalid date format! Please use YYYY-MM-DD format with leading zeros (e.g., 2000-01-01).");
                 ConsoleUtils.waitForEnter(scanner);
                 return;
             }
@@ -308,15 +324,8 @@ public class MainMenu {
         } while (!RegisterRequirement.isValidNationality(nationality));
 
         try {
-            // Format the date to ensure it has leading zeros
-            String[] dateParts = dateOfBirth.split("-");
-            String formattedDate = String.format("%s-%02d-%02d", 
-                dateParts[0], 
-                Integer.parseInt(dateParts[1]), 
-                Integer.parseInt(dateParts[2]));
-            
             currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone, 
-                passportNumber, LocalDate.parse(formattedDate), nationality);
+                passportNumber, LocalDate.parse(dateOfBirth), nationality);
             System.out.println("\nRegistration successful!");
             ConsoleUtils.waitForEnter(scanner);
         } catch (Exception e) {
@@ -354,6 +363,4 @@ public class MainMenu {
         // Presidential Room (1 room)
         rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("800"), 5));
     }
-
-    
 }
