@@ -72,6 +72,10 @@ public class ReservationsMenu {
         }
     }
 
+    private boolean validateBackOption(String input) {
+        return input.equalsIgnoreCase("back");
+    }
+
     private void makeNewReservation(Guest guest) {
         ConsoleUtils.clearScreen();
         System.out.println("\n╔═══════════════════════════════════════════════════════════════════╗");
@@ -109,16 +113,22 @@ public class ReservationsMenu {
         // Get room type selection
         RoomType selectedType = null;
         while (selectedType == null) {
-            System.out.print("\nSelect room type (1-" + types.length + "): ");
+            System.out.print("\nSelect room type (1-" + types.length + ") or type 'back' to return: ");
+            String input = scanner.nextLine();
+            
+            if (validateBackOption(input)) {
+                return;
+            }
+            
             try {
-                int choice = Integer.parseInt(scanner.nextLine()) - 1;
+                int choice = Integer.parseInt(input) - 1;
                 if (choice >= 0 && choice < types.length) {
                     selectedType = types[choice];
                 } else {
                     System.out.println("Invalid selection. Please try again.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter a number.");
+                System.out.println("Invalid input. Please enter a number or 'back'.");
             }
         }
 
@@ -128,28 +138,40 @@ public class ReservationsMenu {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         while (checkIn == null) {
-            System.out.print("\nEnter check-in date (YYYY-MM-DD): ");
+            System.out.print("\nEnter check-in date (YYYY-MM-DD) or type 'back' to return: ");
+            String input = scanner.nextLine();
+            
+            if (validateBackOption(input)) {
+                return;
+            }
+            
             try {
-                checkIn = LocalDate.parse(scanner.nextLine(), formatter);
+                checkIn = LocalDate.parse(input, formatter);
                 if (checkIn.isBefore(LocalDate.now())) {
                     System.out.println("Check-in date cannot be in the past.");
                     checkIn = null;
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+                System.out.println("Invalid date format. Please use YYYY-MM-DD or type 'back'.");
             }
         }
 
         while (checkOut == null) {
-            System.out.print("Enter check-out date (YYYY-MM-DD): ");
+            System.out.print("Enter check-out date (YYYY-MM-DD) or type 'back' to return: ");
+            String input = scanner.nextLine();
+            
+            if (validateBackOption(input)) {
+                return;
+            }
+            
             try {
-                checkOut = LocalDate.parse(scanner.nextLine(), formatter);
+                checkOut = LocalDate.parse(input, formatter);
                 if (checkOut.isBefore(checkIn)) {
                     System.out.println("Check-out date must be after check-in date.");
                     checkOut = null;
                 }
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+                System.out.println("Invalid date format. Please use YYYY-MM-DD or type 'back'.");
             }
         }
 
@@ -427,6 +449,13 @@ public class ReservationsMenu {
             if (order.getGuest().equals(reservation.getGuest()) && 
                 !invoice.getRoomServices().contains(order)) {
                 invoice.addRoomService(order);
+                System.out.println("\nAdded room service order to invoice:");
+                System.out.println("Order ID: " + order.getId());
+                System.out.println("Date: " + order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println("Total Amount: RM " + order.getTotalAmount());
+                for (var item : order.getItems()) {
+                    System.out.println("- " + item.getName() + " (RM " + item.getPrice() + ")");
+                }
             }
         }
 
@@ -469,6 +498,21 @@ public class ReservationsMenu {
                     roomServiceMenu.displayMenu((Guest)reservation.getGuest(), reservation.getRoom());
                     // Refresh invoice after room service order
                     invoice = paymentService.getInvoiceById(reservation.getId());
+                    // Add new room service orders to invoice
+                    List<RoomServiceOrder> newOrders = roomServiceManager.getOrdersForRoom(reservation.getRoom());
+                    for (RoomServiceOrder order : newOrders) {
+                        if (order.getGuest().equals(reservation.getGuest()) && 
+                            !invoice.getRoomServices().contains(order)) {
+                            invoice.addRoomService(order);
+                            System.out.println("\nAdded new room service order to invoice:");
+                            System.out.println("Order ID: " + order.getId());
+                            System.out.println("Date: " + order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                            System.out.println("Total Amount: RM " + order.getTotalAmount());
+                            for (var item : order.getItems()) {
+                                System.out.println("- " + item.getName() + " (RM " + item.getPrice() + ")");
+                            }
+                        }
+                    }
                     break;
                 case "0":
                     return;
@@ -558,10 +602,13 @@ public class ReservationsMenu {
             BigDecimal orderTotal = order.getTotalAmount();
             roomServiceTotal = roomServiceTotal.add(orderTotal);
             System.out.printf("║ Order ID: %-52s ║\n", order.getId());
+            System.out.printf("║ Date: %-56s ║\n", order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
             for (var item : order.getItems()) {
                 System.out.printf("║ • %-60s ║\n", item.getName());
                 System.out.printf("║   RM %-51.2f ║\n", item.getPrice());
             }
+            System.out.printf("║ Order Total: RM %-45.2f ║\n", orderTotal);
+            System.out.println("║                                                                ║");
         }
         
         if (hasRoomService) {
