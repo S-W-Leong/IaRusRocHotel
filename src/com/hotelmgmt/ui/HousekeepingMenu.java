@@ -23,14 +23,17 @@
 
         public void showMenu() {
             while (true) {
-                System.out.println("\n--- Housekeeping Management ---");
-                System.out.println("1. Assign Task");
-                System.out.println("2. List Tasks");
-                System.out.println("3. Update Task Status");
-                System.out.println("4. Add Housekeeping Staff");
-                System.out.println("5. List Housekeeping Staff");
-                System.out.println("6. Remove Housekeeping Staff");
-                System.out.println("0. Exit");
+                System.out.println("\n╔═══════════════════════════════╗");
+                System.out.println("║ 1. Assign Task                ║");
+                System.out.println("║ 2. List Tasks                 ║");
+                System.out.println("║ 3. Update Task Status         ║");
+                System.out.println("║                               ║");
+                System.out.println("║ 4. Add Housekeeping Staff     ║");
+                System.out.println("║ 5. List Housekeeping Staff    ║");
+                System.out.println("║ 6. Remove Housekeeping Staff  ║");
+                System.out.println("║                               ║");
+                System.out.println("║ 0. Exit                       ║");
+                System.out.println("╚═══════════════════════════════╝");  
                 System.out.print("Select option: ");
                 int choice = Integer.parseInt(scanner.nextLine());
                 switch (choice) {

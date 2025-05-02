@@ -1,7 +1,6 @@
 package com.hotelmgmt.ui;
 
 import com.hotelmgmt.models.housekeeping.HousekeepingTask;
-import com.hotelmgmt.models.housekeeping.TaskStatus;
 import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.user.Staff;
 import com.hotelmgmt.services.HousekeepingService;
