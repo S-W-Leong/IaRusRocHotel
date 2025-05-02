@@ -415,12 +415,13 @@ public class ReservationsMenu {
             return;
         }
 
+        // Get or create invoice
         Invoice invoice = paymentService.getInvoiceById(reservation.getId());
         if (invoice == null) {
             invoice = paymentService.createInvoice(reservation);
         }
 
-        // Add room service orders to invoice
+        // Add any existing room service orders to invoice
         List<RoomServiceOrder> orders = roomServiceManager.getOrdersForRoom(reservation.getRoom());
         for (RoomServiceOrder order : orders) {
             if (order.getGuest().equals(reservation.getGuest()) && 
@@ -429,39 +430,113 @@ public class ReservationsMenu {
             }
         }
 
+        // If invoice is already paid, proceed with checkout immediately
+        if (invoice.getPaymentStatus() == PaymentStatus.PAID) {
+            if (bookingManager.checkOut(reservation, null, null, null)) {
+                System.out.println("\nSuccessfully checked out!");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            } else {
+                System.out.println("\nCheck-out failed. Please contact hotel staff.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+        }
+
+        // If not paid, process payment
+        processCheckoutPayment(invoice, reservation);
+    }
+
+    private void processCheckoutPayment(Invoice invoice, Reservation reservation) {
         while (invoice.getPaymentStatus() != PaymentStatus.PAID) {
             displayCheckoutInvoice(invoice, reservation);
             
-            System.out.print("\nEnter payment amount (RM): ");
-            try {
-                BigDecimal amount = new BigDecimal(scanner.nextLine());
-                PaymentMethod selectedMethod = getPaymentMethod();
-                
-                System.out.print("Enter transaction reference: ");
-                String transactionRef = scanner.nextLine();
-                
-                System.out.print("Enter notes (optional): ");
-                String notes = scanner.nextLine();
+            System.out.println("\n1. Make Payment");
+            System.out.println("2. View Room Service Details");
+            System.out.println("3. Order Room Service (Optional)");
+            System.out.println("0. Cancel Checkout");
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
 
-                boolean paid = paymentService.processPayment(invoice, amount, selectedMethod, transactionRef, notes);
-                
-                if (paid) {
-                    if (bookingManager.checkOut(reservation, selectedMethod, transactionRef, notes)) {
-                        System.out.println("\nSuccessfully checked out!");
-                        ConsoleUtils.waitForEnter(scanner);
-                        return;
-                    } else {
-                        System.out.println("\nCheck-out failed. Please contact hotel staff.");
-                    }
-                } else {
-                    System.out.println("\nPartial payment received. Full payment required to complete check-out.");
-                }
-                ConsoleUtils.waitForEnter(scanner);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid amount. Please enter a valid number.");
-                ConsoleUtils.waitForEnter(scanner);
+            switch (choice) {
+                case "1":
+                    processPayment(invoice, reservation);
+                    break;
+                case "2":
+                    displayRoomServiceDetails(invoice);
+                    break;
+                case "3":
+                    roomServiceMenu.displayMenu((Guest)reservation.getGuest(), reservation.getRoom());
+                    // Refresh invoice after room service order
+                    invoice = paymentService.getInvoiceById(reservation.getId());
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+                    ConsoleUtils.waitForEnter(scanner);
             }
         }
+    }
+
+    private void processPayment(Invoice invoice, Reservation reservation) {
+        System.out.print("\nEnter payment amount (RM): ");
+        try {
+            BigDecimal amount = new BigDecimal(scanner.nextLine());
+            PaymentMethod selectedMethod = getPaymentMethod();
+            
+            System.out.print("Enter transaction reference: ");
+            String transactionRef = scanner.nextLine();
+            
+            System.out.print("Enter notes (optional): ");
+            String notes = scanner.nextLine();
+
+            boolean paid = paymentService.processPayment(invoice, amount, selectedMethod, transactionRef, notes);
+            
+            if (paid) {
+                if (bookingManager.checkOut(reservation, selectedMethod, transactionRef, notes)) {
+                    System.out.println("\nSuccessfully checked out!");
+                    ConsoleUtils.waitForEnter(scanner);
+                    return;
+                } else {
+                    System.out.println("\nCheck-out failed. Please contact hotel staff.");
+                }
+            } else {
+                System.out.println("\nPartial payment received. Full payment required to complete check-out.");
+                System.out.printf("Remaining balance: RM %.2f\n", 
+                    invoice.getTotalAmount().subtract(invoice.getPaidAmount()));
+            }
+            ConsoleUtils.waitForEnter(scanner);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid amount. Please enter a valid number.");
+            ConsoleUtils.waitForEnter(scanner);
+        }
+    }
+
+    private void displayRoomServiceDetails(Invoice invoice) {
+        ConsoleUtils.clearScreen();
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    ROOM SERVICE DETAILS                         ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        
+        List<RoomServiceOrder> orders = invoice.getRoomServices();
+        if (orders.isEmpty()) {
+            System.out.println("║ No room service orders found.                                    ║");
+        } else {
+            for (RoomServiceOrder order : orders) {
+                System.out.printf("║ Order ID: %-52s ║\n", order.getId());
+                System.out.printf("║ Date: %-54s ║\n", order.getOrderTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+                System.out.println("║ Items:                                                         ║");
+                for (var item : order.getItems()) {
+                    System.out.printf("║ • %-56s ║\n", item.getName());
+                    System.out.printf("║   RM %-54.2f ║\n", item.getPrice());
+                }
+                System.out.printf("║ Order Total: RM %-44.2f ║\n", order.getTotalAmount());
+                System.out.println("║                                                                ║");
+            }
+        }
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        ConsoleUtils.waitForEnter(scanner);
     }
 
     private void displayCheckoutInvoice(Invoice invoice, Reservation reservation) {
