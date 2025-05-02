@@ -1,15 +1,9 @@
 package com.hotelmgmt.ui;
 
 import com.hotelmgmt.models.billing.Invoice;
-import com.hotelmgmt.models.billing.Payment;
-import com.hotelmgmt.models.billing.PaymentMethod;
-import com.hotelmgmt.models.billing.PaymentStatus;
 import com.hotelmgmt.models.reservation.Reservation;
-import com.hotelmgmt.models.reservation.ReservationStatus;
 import com.hotelmgmt.models.room.Room;
 import com.hotelmgmt.models.room.RoomData;
-import com.hotelmgmt.models.room.RoomType;
-import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
 import com.hotelmgmt.models.user.Guest;
@@ -28,7 +22,6 @@ import com.hotelmgmt.services.RoomService;
 import com.hotelmgmt.services.RoomServiceManager;
 import com.hotelmgmt.services.ViewProfile;
 import com.hotelmgmt.utils.ConsoleUtils;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +31,7 @@ public class MainMenu {
     private final Scanner scanner;
     private final AuthenticationService authService;
     private User currentUser;
-    private final List<Room> rooms = new ArrayList<>();
+    private List<Room> rooms;
     private final List<Reservation> reservations = new ArrayList<>();
     private final List<RoomServiceOrder> roomServices = new ArrayList<>();
     private final List<MenuItem> menuItems = new ArrayList<>();
@@ -55,7 +48,7 @@ public class MainMenu {
     public MainMenu(Scanner scanner) {
         this.scanner = scanner;
         this.authService = new AuthenticationService();
-        seedRooms();
+        this.rooms = RoomData.getRooms();
         this.roomService = new RoomService(rooms);
         this.reservationService = new ReservationService();
         this.roomServiceManager = new RoomServiceManager(rooms);
@@ -77,28 +70,28 @@ public class MainMenu {
     }
 
     private void showLoginMenu() {
-        ConsoleUtils.clearScreen();
-        Logo.display();
+            ConsoleUtils.clearScreen();
+            Logo.display();
         System.out.println("\n1. Login");
         System.out.println("2. Register");
         System.out.println("0. Exit");
-        System.out.print("\nEnter your choice: ");
-        String choice = scanner.nextLine();
+            System.out.print("\nEnter your choice: ");
+            String choice = scanner.nextLine();
 
-        switch (choice) {
-            case "1":
-                login();
-                break;
-            case "2":
-                register();
-                break;
+            switch (choice) {
+                case "1":
+                    login();
+                    break;
+                case "2":
+                    register();
+                    break;
             case "0":
                 System.out.println("\nThank you for using our system!");
-                System.exit(0);
-                break;
-            default:
+                    System.exit(0);
+                    break;
+                default:
                 System.out.println("\nInvalid choice. Please try again.");
-                ConsoleUtils.waitForEnter(scanner);
+                    ConsoleUtils.waitForEnter(scanner);
         }
     }
 
@@ -107,21 +100,21 @@ public class MainMenu {
             ConsoleUtils.clearScreen();
             Logo.display();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.printf("║ Welcome, %-52s ║\n", currentUser.getFullName());
+            System.out.printf("║ Welcome, %-53s ║\n", currentUser.getFullName());
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
             System.out.println("║ 1. View Profile                                                ║");
             
             if (currentUser.getRole() == UserRole.GUEST) {
-                System.out.println("║ 2. Room Booking & Reservations                                ║");
+                System.out.println("║ 2. Room Booking & Reservations                                 ║");
             } else if (currentUser.getRole() == UserRole.MANAGER) {
-                System.out.println("║ 2. Room Management                                           ║");
-                System.out.println("║ 3. Housekeeping Management                                   ║");
-                System.out.println("║ 4. Reports                                                   ║");
+                System.out.println("║ 2. Room Management                                             ║");
+                System.out.println("║ 3. Housekeeping Management                                     ║");
+                System.out.println("║ 4. Reports                                                     ║");
             } else {
-                System.out.println("║ 2. View Tasks                                                ║");
-                System.out.println("║ 3. View Room Status                                          ║");
+                System.out.println("║ 2. View Tasks                                                  ║");
+                System.out.println("║ 3. View Room Status                                            ║");
             }
-            
+
             System.out.println("║ 0. Logout                                                      ║");
             System.out.println("╚════════════════════════════════════════════════════════════════╝");
             
@@ -156,7 +149,7 @@ public class MainMenu {
                     viewProfile();
                     break;
                 case "2":
-                    roomManager.manageRooms();
+                    new RoomManageMenu(scanner, roomManager).showMenu();
                     break;
                 case "3":
                     new HousekeepingMenu(housekeepingService, roomManager).showMenu();
@@ -317,36 +310,4 @@ public class MainMenu {
             ConsoleUtils.waitForEnter(scanner);
         }
     }
-
-    // Seed some rooms
-    private void seedRooms() {
-        // Standard Rooms (20 rooms)
-        for (int i = 1; i <= 20; i++) {
-            String roomNumber = String.format("SD%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.STANDARD, new BigDecimal("200"), 1));
-        }
-
-        // Deluxe Rooms (15 rooms)
-        for (int i = 1; i <= 15; i++) {
-            String roomNumber = String.format("DX%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.DELUXE, new BigDecimal("350"), 2));
-        }
-
-        // Suite Rooms (10 rooms)
-        for (int i = 1; i <= 10; i++) {
-            String roomNumber = String.format("ST%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.SUITE, new BigDecimal("400"), 3));
-        }
-
-        // Executive Rooms (5 rooms)
-        for (int i = 1; i <= 5; i++) {
-            String roomNumber = String.format("ET%03d", i);
-            rooms.add(new Room(roomNumber, RoomType.EXECUTIVE_SUITE, new BigDecimal("500"), 4));
-        }
-
-        // Presidential Room (1 room)
-        rooms.add(new Room("PE501", RoomType.PRESIDENTIAL_SUITE, new BigDecimal("800"), 5));
-    }
-
-    
 }
