@@ -54,7 +54,7 @@ public class HousekeepingStaffMenu {
                 notes);
         }
         
-        System.out.println("╚════════════╧════════════════╧════════════════╧═════════╧══════════╝");
+        System.out.println("╚════════════╧════════════════╧════════════════╧═════════╧═══════════╝");
         ConsoleUtils.waitForEnter(scanner);
     }
 } 
