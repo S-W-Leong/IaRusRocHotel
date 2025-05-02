@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class HousekeepingStaffMenu {
-    private final Scanner scanner;
+    private final Scanner scanner;when 
     private final HousekeepingService housekeepingService;
     private final RoomManager roomManager;
     private final Staff currentStaff;

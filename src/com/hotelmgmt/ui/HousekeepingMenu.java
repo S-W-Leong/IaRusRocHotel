@@ -34,30 +34,41 @@
                 System.out.println("║ 0. Exit                       ║");
                 System.out.println("╚═══════════════════════════════╝");  
                 System.out.print("Select option: ");
-                int choice = Integer.parseInt(scanner.nextLine());
-                switch (choice) {
-                    case 1:
-                        assignTask();
-                        break;
-                    case 2:
-                        listTasks();
-                        break;
-                    case 3:
-                        updateTaskStatus();
-                        break;
-                    case 4:
-                        addStaff();
-                        break;
-                    case 5:
-                        listStaff();
-                        break;
-                    case 6:
-                        removeStaff();
-                        break;
-                    case 0:
-                        return;
-                    default:
-                        System.out.println("Invalid option.");
+                String input = scanner.nextLine().trim();
+                
+                if (input.isEmpty()) {
+                    System.out.println("Please enter a valid option.");
+                    continue;
+                }
+
+                try {
+                    int choice = Integer.parseInt(input);
+                    switch (choice) {
+                        case 1:
+                            assignTask();
+                            break;
+                        case 2:
+                            listTasks();
+                            break;
+                        case 3:
+                            updateTaskStatus();
+                            break;
+                        case 4:
+                            addStaff();
+                            break;
+                        case 5:
+                            listStaff();
+                            break;
+                        case 6:
+                            removeStaff();
+                            break;
+                        case 0:
+                            return;
+                        default:
+                            System.out.println("Invalid option.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Please enter a valid number.");
                 }
             }
         }
@@ -270,15 +281,33 @@
 
         private void addStaff() {
             System.out.print("Enter staff username: ");
-            String username = scanner.nextLine();
+            String username = scanner.nextLine().trim();
+            
+            if (username.isEmpty()) {
+                System.out.println("Username cannot be empty.");
+                return;
+            }
+
             System.out.print("Enter first name: ");
-            String firstName = scanner.nextLine();
+            String firstName = scanner.nextLine().trim();
+            
+            if (firstName.isEmpty()) {
+                System.out.println("First name cannot be empty.");
+                return;
+            }
+
             System.out.print("Enter last name: ");
-            String lastName = scanner.nextLine();
+            String lastName = scanner.nextLine().trim();
+            
+            if (lastName.isEmpty()) {
+                System.out.println("Last name cannot be empty.");
+                return;
+            }
+
             Staff staff = new Staff(username, "pass", firstName, lastName, username + "@hotel.com", "1234567890", null,
                     "E" + System.currentTimeMillis(), java.time.LocalDate.now(), "Housekeeping");
             housekeepingService.addStaff(staff);
-            System.out.println("Staff added.");
+            System.out.println("Staff added successfully.");
         }
 
         private void listStaff() {
