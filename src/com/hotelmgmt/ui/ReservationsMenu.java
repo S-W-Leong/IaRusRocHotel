@@ -307,9 +307,9 @@ public class ReservationsMenu {
         while (true) {
             ConsoleUtils.clearScreen();
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                   RESERVATION DETAILS                           ║");
-            System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.printf("║ Room Number: %-50s ║\n", reservation.getRoom().getRoomNumber());
+            System.out.println(  "║                  RESERVATION DETAILS                           ║");
+            System.out.println(  "╠════════════════════════════════════════════════════════════════╣");
+            System.out.printf("║ Room Number: %-50s║\n", reservation.getRoom().getRoomNumber());
             System.out.printf("║ Room Type: %-51s ║\n", reservation.getRoom().getType());
             System.out.printf("║ Status: %-54s ║\n", reservation.getStatus());
             System.out.printf("║ Check-in Date: %-47s ║\n", reservation.getCheckInDate().toLocalDate());
@@ -320,8 +320,8 @@ public class ReservationsMenu {
             Invoice invoice = paymentService.getInvoiceById(reservation.getId());
             if (invoice != null) {
                 System.out.println("║                                                                ║");
-                System.out.println("║ Invoice Details:                                              ║");
-                System.out.printf("║ Payment Status: %-47s ║\n", invoice.getPaymentStatus());
+                System.out.println("║ Invoice Details:                                               ║");
+                System.out.printf("║ Payment Status: %-46s ║\n", invoice.getPaymentStatus());
                 System.out.printf("║ Amount Paid: RM %-46.2f ║\n", invoice.getPaidAmount());
                 System.out.printf("║ Outstanding: RM %-46.2f ║\n", 
                     invoice.getTotalAmount().subtract(invoice.getPaidAmount()));
@@ -516,8 +516,8 @@ public class ReservationsMenu {
     private void displayRoomServiceDetails(Invoice invoice) {
         ConsoleUtils.clearScreen();
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    ROOM SERVICE DETAILS                         ║");
-        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.println(  "║                    ROOM SERVICE DETAILS                        ║");
+        System.out.println(  "╠════════════════════════════════════════════════════════════════╣");
         
         List<RoomServiceOrder> orders = invoice.getRoomServices();
         if (orders.isEmpty()) {

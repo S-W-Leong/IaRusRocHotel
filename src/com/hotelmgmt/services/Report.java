@@ -115,7 +115,7 @@ public class Report {
         System.out.println("╠════════════════════════════════════════════════════════════════╣");
         paymentsByMethod.forEach((method, amount) -> {
             double percentage = amount.doubleValue() / totalPaidAmount[0].doubleValue() * 100;
-            System.out.printf("║ %-15s: RM %-39.2f (%.1f%%) ║\n", method, amount, percentage);
+            System.out.printf("║ %-15s: RM %-35.2f (%.1f%%) ║\n", method, amount, percentage);
         });
         
         // Print Revenue Breakdown
@@ -183,7 +183,7 @@ public class Report {
             .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
             .forEach(entry -> {
                 double percentage = (double) entry.getValue() / totalBookings * 100;
-                System.out.printf("║ %-20s: %-30d bookings (%.1f%%) ║\n", 
+                System.out.printf("║ %-20s: %-21d bookings (%.1f%%) ║\n", 
                     entry.getKey(), entry.getValue(), percentage);
             });
         
@@ -214,7 +214,7 @@ public class Report {
     // Room Service Revenue Report
     public void generateRoomServiceRevenueReport(LocalDate startDate, LocalDate endDate) {
         System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println( " ║                  ROOM SERVICE REVENUE REPORT                   ║");
+        System.out.println(  "║                  ROOM SERVICE REVENUE REPORT                   ║");
         System.out.println(  "╠════════════════════════════════════════════════════════════════╣");
         System.out.printf("║ Period: %-54s ║\n", startDate + " to " + endDate);
         System.out.printf("║ Generated on: %-48s ║\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
