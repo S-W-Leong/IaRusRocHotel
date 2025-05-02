@@ -6,7 +6,6 @@ import com.hotelmgmt.models.room.RoomStatus;
 import com.hotelmgmt.models.roomService.MenuCategory;
 import com.hotelmgmt.models.roomService.MenuItem;
 import com.hotelmgmt.models.roomService.RoomServiceOrder;
-import com.hotelmgmt.models.roomService.RoomServiceStatus;
 import com.hotelmgmt.models.user.Guest;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -14,7 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-// RoomServiceManager is a class that manages the room service orders in the hotel. It allows the user to place orders, update the status of an order, and get all orders for a guest or room.
+// RoomServiceManager is a class that manages the room service orders in the hotel.
+// It allows users to place orders and retrieve order information by guest or room.
 public class RoomServiceManager {
     private List<Room> rooms;
     private List<RoomServiceOrder> roomServiceOrders;
@@ -74,25 +74,6 @@ public class RoomServiceManager {
         return roomServiceOrders.stream()
             .filter(order -> order.getRoom().getRoomNumber().equals(roomNumber))
             .toList();
-    }
-
-    public List<RoomServiceOrder> getOrdersByStatus(RoomServiceStatus status) {
-        return roomServiceOrders.stream()
-            .filter(order -> order.getStatus() == status)
-            .toList();
-    }
-
-    public boolean updateOrderStatus(String orderId, RoomServiceStatus newStatus) {
-        RoomServiceOrder order = roomServiceOrders.stream()
-            .filter(o -> o.getId().equals(orderId))
-            .findFirst()
-            .orElse(null);
-
-        if (order != null) {
-            order.setStatus(newStatus);
-            return true;
-        }
-        return false;
     }
 
     public List<RoomServiceOrder> getAllOrders() {

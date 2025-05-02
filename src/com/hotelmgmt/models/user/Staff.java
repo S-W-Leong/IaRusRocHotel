@@ -25,4 +25,15 @@ public class Staff extends User {
     public void setDepartment(String department) { this.department = department; }
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Staff staff = (Staff) o;
+        return employeeId != null && employeeId.equals(staff.employeeId);
+    }
+
+    public int hashCode() {
+        return employeeId != null ? employeeId.hashCode() : 0;
+    }
 } 
