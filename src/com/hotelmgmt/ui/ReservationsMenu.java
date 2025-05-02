@@ -45,13 +45,13 @@ public class ReservationsMenu {
     public void displayMenu(Guest guest) {
         while (true) {
             ConsoleUtils.clearScreen();
-            System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+            System.out.println("\n╔══════════════════════════════════════════════════════════════════╗");
             System.out.println("║                    RESERVATIONS MANAGEMENT                       ║");
-            System.out.println("╠════════════════════════════════════════════════════════════════╣");
-            System.out.println("║ 1. Make New Reservation                                         ║");
-            System.out.println("║ 2. View My Reservations                                         ║");
-            System.out.println("║ 0. Back to Main Menu                                           ║");
-            System.out.println("╚════════════════════════════════════════════════════════════════╝");
+            System.out.println("╠══════════════════════════════════════════════════════════════════╣");
+            System.out.println("║ 1. Make New Reservation                                          ║");
+            System.out.println("║ 2. View My Reservations                                          ║");
+            System.out.println("║ 0. Back to Main Menu                                             ║");
+            System.out.println("╚══════════════════════════════════════════════════════════════════╝");
 
             System.out.print("\nEnter your choice (0-2): ");
             String choice = scanner.nextLine();
@@ -74,17 +74,17 @@ public class ReservationsMenu {
 
     private void makeNewReservation(Guest guest) {
         ConsoleUtils.clearScreen();
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                      NEW RESERVATION                             ║");
-        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.println("\n╔═══════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                      NEW RESERVATION                              ║");
+        System.out.println("╠═══════════════════════════════════════════════════════════════════╣");
         
         // Display available room types
         RoomType[] types = RoomType.values();
         List<Room> allRooms = roomService.getRooms();
         
-        System.out.println("║                                                                ║");
-        System.out.println("║ Available Room Types:                                         ║");
-        System.out.println("║                                                                ║");
+        System.out.println("║                                                                   ║");
+        System.out.println("║ Available Room Types:                                             ║");
+        System.out.println("║                                                                   ║");
         for (int i = 0; i < types.length; i++) {
             RoomType type = types[i];
             List<Room> roomsOfType = allRooms.stream()
@@ -100,11 +100,11 @@ public class ReservationsMenu {
             
             System.out.printf("║ %d. %-20s RM %-8.2f  Available: %-3d               ║\n", 
                 i + 1, type, minPrice, availableCount);
-            System.out.printf("║    %-54s ║\n", type.getDescription());
-            System.out.println("║                                                                ║");
+            System.out.printf("║    %-62s ║\n", type.getDescription());
+            System.out.println("║                                                                   ║");
         }
         
-        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.println("╚═══════════════════════════════════════════════════════════════════╝");
         
         // Get room type selection
         RoomType selectedType = null;
@@ -253,11 +253,11 @@ public class ReservationsMenu {
             List<Reservation> myReservations = reservationService.getReservationsForGuest(guest);
 
             System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                      MY RESERVATIONS                            ║");
+            System.out.println("║                      MY RESERVATIONS                           ║");
             System.out.println("╠════════════════════════════════════════════════════════════════╣");
 
             if (myReservations.isEmpty()) {
-                System.out.println("║ No reservations found.                                          ║");
+                System.out.println("║ No reservations found.                                         ║");
                 System.out.println("╚════════════════════════════════════════════════════════════════╝");
                 ConsoleUtils.waitForEnter(scanner);
                 return;
