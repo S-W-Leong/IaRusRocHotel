@@ -20,7 +20,7 @@ public class RoomManager {
 
     public void manageRooms() {
         ConsoleUtils.clearScreen();
-        System.out.println("\n--- Room Management ---");
+        System.out.println("\n═════ Room Management ═════");
         System.out.println("1. View All Rooms");
         System.out.println("2. Add New Room");
         System.out.println("3. Update Room Status");
@@ -73,34 +73,80 @@ public class RoomManager {
         System.out.println("                    ═════════════════════════════");
         displayRoomRequirements();
 
-        System.out.print("Enter room number: ");
-        String roomNumber = scanner.nextLine();
-        
-        // Check if room number already exists
-        boolean roomExists = rooms.stream()
-            .anyMatch(room -> room.getRoomNumber().equals(roomNumber));
+        try {
+            System.out.print("Enter room number: ");
+            String roomNumber = scanner.nextLine().toUpperCase();
             
-        if (roomExists) {
-            System.out.println("\nError: Room number " + roomNumber + " is already in use. Please choose another.");
+            // Validate room number format (TTFRR)
+            if (!roomNumber.matches("^(SD|DX|ST|ET|PE)[1-5]\\d{2}$")) {
+                System.out.println("\nError: Invalid room number format. Please follow the format TTFRR (e.g., SD101)");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+            
+            // Check if room number already exists
+            boolean roomExists = rooms.stream()
+                .anyMatch(room -> room.getRoomNumber().equals(roomNumber));
+                
+            if (roomExists) {
+                System.out.println("\nError: Room number " + roomNumber + " is already in use. Please choose another.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+            
+            System.out.print("Enter room type : ");
+            String roomType = scanner.nextLine().toUpperCase();
+            
+            // Validate room type
+            try {
+                RoomType.valueOf(roomType);
+            } catch (IllegalArgumentException e) {
+                System.out.println("\nError: Invalid room type. Please enter a valid room type.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+            
+            System.out.print("Enter base price: ");
+            String priceStr = scanner.nextLine();
+            BigDecimal price;
+            try {
+                price = new BigDecimal(priceStr);
+                if (price.compareTo(BigDecimal.ZERO) <= 0) {
+                    System.out.println("\nError: Price must be greater than 0.");
+                    ConsoleUtils.waitForEnter(scanner);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\nError: Invalid price format. Please enter a valid number.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+            
+            System.out.print("Enter floor number (1-5): ");
+            int floor;
+            try {
+                floor = Integer.parseInt(scanner.nextLine());
+                if (floor < 1 || floor > 5) {
+                    System.out.println("\nError: Floor number must be between 1 and 5.");
+                    ConsoleUtils.waitForEnter(scanner);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\nError: Invalid floor number. Please enter a valid number between 1 and 5.");
+                ConsoleUtils.waitForEnter(scanner);
+                return;
+            }
+            
+            Room newRoom = new Room(roomNumber, RoomType.valueOf(roomType), price, floor);
+            rooms.add(newRoom);
+            
+            System.out.println("\nRoom " + roomNumber + " has been added successfully!");
+            ConsoleUtils.waitForEnter(scanner);
+        } catch (Exception e) {
+            System.out.println("\nError: An unexpected error occurred. Please try again.");
             ConsoleUtils.waitForEnter(scanner);
             return;
         }
-        
-        System.out.print("Enter room type: ");
-        String roomType = scanner.nextLine();
-        
-        System.out.print("Enter base price: ");
-        String priceStr = scanner.nextLine();
-        BigDecimal price = new BigDecimal(priceStr);
-        
-        System.out.print("Enter floor number: ");
-        int floor = Integer.parseInt(scanner.nextLine());
-        
-        Room newRoom = new Room(roomNumber, RoomType.valueOf(roomType.toUpperCase()), price, floor);
-        rooms.add(newRoom);
-        
-        System.out.println("\nRoom " + roomNumber + " has been added successfully!");
-        ConsoleUtils.waitForEnter(scanner);
     }
 
     public static void displayRoomRequirements() {
