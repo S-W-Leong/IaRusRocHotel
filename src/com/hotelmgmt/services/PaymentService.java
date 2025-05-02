@@ -29,8 +29,33 @@ public class PaymentService {
     }
 
     public boolean processPayment(Invoice invoice, BigDecimal amount, PaymentMethod method, String transactionReference, String notes) {
-        Payment payment = new Payment(invoice.getId(), amount, method, transactionReference, notes);
-        invoice.addPayment(payment);
+        BigDecimal remainingAmount = invoice.getTotalAmount().subtract(invoice.getPaidAmount());
+        
+        // Always show receipt
+        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                    PAYMENT RECEIPT                             ║");
+        System.out.println("╠════════════════════════════════════════════════════════════════╣");
+        System.out.println("║                                                                ║");
+        System.out.printf("║  Amount Paid: RM%-46.2f ║\n", amount);
+        System.out.printf("║  Amount Due: RM%-47.2f ║\n", remainingAmount);
+        
+        if (amount.compareTo(remainingAmount) > 0) {
+            // Overpayment case
+            BigDecimal change = amount.subtract(remainingAmount);
+            System.out.printf("║  Change Given: RM%-45.2f ║\n", change);
+            Payment payment = new Payment(invoice.getId(), remainingAmount, method, transactionReference, 
+                notes + " (Original payment: RM" + amount + ", Change: RM" + change + ")");
+            invoice.addPayment(payment);
+        } else {
+            // Normal payment case
+            System.out.println("║  Change Given: RM0.00                                          ║");
+            Payment payment = new Payment(invoice.getId(), amount, method, transactionReference, notes);
+            invoice.addPayment(payment);
+        }
+        
+        System.out.println("║                                                                ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════╝");
+        
         return invoice.getPaymentStatus() == PaymentStatus.PAID;
     }
 
