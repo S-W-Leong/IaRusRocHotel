@@ -220,7 +220,7 @@ public class MainMenu {
             System.out.print("Enter date of birth (YYYY-MM-DD): ");
             dateOfBirth = scanner.nextLine();
             if (!RegisterRequirement.isValidDateOfBirth(dateOfBirth)) {
-                System.out.println("Invalid date format! Please use YYYY-MM-DD format.");
+                System.out.println("Invalid date format! Please use YYYY-MM-DD format with leading zeros (e.g., 2000-01-01).");
                 ConsoleUtils.waitForEnter(scanner);
                 return;
             }
@@ -238,15 +238,8 @@ public class MainMenu {
         } while (!RegisterRequirement.isValidNationality(nationality));
 
         try {
-            // Format the date to ensure it has leading zeros
-            String[] dateParts = dateOfBirth.split("-");
-            String formattedDate = String.format("%s-%02d-%02d", 
-                dateParts[0], 
-                Integer.parseInt(dateParts[1]), 
-                Integer.parseInt(dateParts[2]));
-            
             currentUser = authService.registerGuest(username, password, firstName, lastName, email, phone, 
-                passportNumber, LocalDate.parse(formattedDate), nationality);
+                passportNumber, LocalDate.parse(dateOfBirth), nationality);
             System.out.println("\nRegistration successful!");
             ConsoleUtils.waitForEnter(scanner);
         } catch (Exception e) {
